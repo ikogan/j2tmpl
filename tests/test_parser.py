@@ -50,7 +50,10 @@ def test_duplicate_keys_error():
             'oneTwoThree': 'failure'
         })
 
-    assert 'oneTwoThree is defined multiple times' in str(excinfo.value)
+    assert (
+        'oneTwoThree is defined multiple times' in str(excinfo.value) or
+        'ONE_TWO_THREE is defined multiple times' in str(excinfo.value)
+    )
 
     # This is a slightly different code path. If the duplication
     # is in the middle of the largest similar key, it's caught in
@@ -62,4 +65,7 @@ def test_duplicate_keys_error():
             'oneTwo': 'failure'
         })
 
-    assert 'oneTwo is defined multiple times' in str(excinfo.value)
+    assert (
+        'oneTwo is defined multiple times' in str(excinfo.value) or
+        'ONE_TWO is defined multiple times' in str(excinfo.value)
+    )
