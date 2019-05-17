@@ -1,0 +1,12 @@
+dist: xenial
+language: python
+python:
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+script:
+  python3 setup.py test
+  python3 setup.py build
+  pyinstaller -F j2tmpl/cli.py -n j2tmpl
