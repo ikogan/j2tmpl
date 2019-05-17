@@ -1,10 +1,47 @@
 #!/usr/bin/env python
-from setuptools import find_packages, setup
+"""
+Simple command line template renderer using
+Jinja2.
 
-try:
-    from j2tmpl import __doc__
-except ImportError:
-    pass
+This will parse the current environment into a dictionary
+tree where each key is split along underscores or
+camelcase and each element is added a sub-dictionary.
+
+For example:
+
+.. code-block:: shell
+
+    DATABASE_ONE_URL=mysql:3306
+    DATABASE_ONE_NAME=one
+    databaseTwoUrl=mysql2:3306
+    databaseTwoName=two
+    AUTH_LDAP=true
+
+Would result in:
+
+.. code-block:: json
+
+    {
+        'database': {
+            'one': {
+                'url': 'mysql1:3306,
+                'name': 'one'
+            },
+            'two': {
+                'url': mysql2:3306,
+                'name': 'two'
+            }
+        },
+        'auth':
+            'ldap': 'true'
+    }
+
+.. code-block:: shell
+
+    $ j2tmpl template.jinja
+    $ j2tmpl --help
+"""
+from setuptools import find_packages, setup
 
 install_requires = ["jinja2"]
 tests_requires = ["pytest", "flake8", "pytest-cover", "pytest-flake8"]
