@@ -7,6 +7,6 @@ python:
   - "3.6"
   - "3.7"
 script:
-  python3 setup.py test
-  python3 setup.py build
-  pyinstaller -F j2tmpl/cli.py -n j2tmpl
+  - python3 setup.py test
+  - python3 setup.py build
+  - pyinstaller -F j2tmpl/cli.py -n j2tmpl
