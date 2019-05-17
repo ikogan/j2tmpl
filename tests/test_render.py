@@ -12,8 +12,7 @@ def test_simple_template(common_environment):
     tmpfile = NamedTemporaryFile()
     args = Namespace(
         template=os.path.join(TEST_TEMPLATE_PATH, "simple.jinja"),
-        output=tmpfile.name,
-        encoding='utf-8')
+        output=tmpfile.name)
 
     cli.render(args, raw_context=common_environment)
 
