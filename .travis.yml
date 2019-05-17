@@ -20,7 +20,10 @@ deploy:
   - provider: releases
     api_key:
       secure: 0vPPGL190DT6HAEcgCzl/yOEnJJ7udSYLoBE+58dyc4LbcHcyj3hQCrU0Dbqc77kTiI3EfxJPCA/lzX94+0q7n69wxkXCYdGsYXY17+PQFw6jOElOumpiHsgnTFBWzJMCFBNwCKS02CG541FMAAemtkydnlX4Z4d6psnVY+izGai40M6lLf0KOuvxfevNTNy+Kdx9lX+Z9Xps/EXoduwN/XabTmyOWPL1Vye1PxFzA8OP0nkOKM0rUgbzQ/Lr+94PJruJEbvLJZAORd5LL5E5RSe/5K5mCS4fipRgX0YxJViggi23PHNgqoV+IypJylI38NO39JMbi13tHXYdI6mHdM17DidvnnXzGGMsJJGoSCJNHD2YyHz8hDO4DQmDeNkpv0Ft/yIUCDNn3UQitgioyJF7A1anJWE+gYYRxejT7ZmKU9X8P5wMV02666DkkiP1/envBoYjsaE63fzAooA1aKrO+jR9jwl1mUjv5XLwKIC3kkLP8defHApKu5n8VrqC2CF+fZnkcMIoHk3a5gK/2XJY0rrNcCdHAeKkXHjNOuqCmcWoz+/VnYIs0vIDP2iuv4pGZ0eYbx9dTw8ZX2lF9zfCJWmFvaSm2RAYYM+V9UTDP7maoP3+TWmAe6iZDHugihlcBps5Pq+Zk+0a6yO3nD7ZU+WFp88bTTbmm1t0l0=
-    file: dist/j2tmpl
+    file_glob: true
+    file:
+      - dist/j2tmpl
+      - dist/j2tmpl-*.egg
     draft: true
     overwrite: true
     skip_cleanup: true

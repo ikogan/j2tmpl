@@ -1,6 +1,10 @@
 #!/usr/bin/env python
-from j2tmpl import __doc__ as clidoc
 from setuptools import find_packages, setup
+
+try:
+    from j2tmpl import __doc__
+except ImportError:
+    pass
 
 install_requires = ["jinja2"]
 tests_requires = ["pytest", "flake8", "pytest-cover", "pytest-flake8"]
@@ -12,7 +16,7 @@ setup(
     author_email="kogan@ohio.edu",
     url="https://github.com/ikogan/j2tmpl",
     description="Jinja2 templating based on environment variables.",
-    long_description=clidoc,
+    long_description=__doc__,
     packages=find_packages(exclude=["tests"]),
     zip_safe=False,
     license="BSD",
