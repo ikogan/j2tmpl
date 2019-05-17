@@ -6,30 +6,31 @@ Jinja2.
 This will parse the current environment into a dictionary
 tree where each key is split along underscores or
 camelcase and each element is added a sub-dictionary.
-For example:
 
-DATABASE_ONE_URL=mysql:3306
-DATABASE_ONE_NAME=one
-databaseTwoUrl=mysql2:3306
-databaseTwoName=two
-AUTH_LDAP=truw
+For example::
 
-Would result in:
+    DATABASE_ONE_URL=mysql:3306
+    DATABASE_ONE_NAME=one
+    databaseTwoUrl=mysql2:3306
+    databaseTwoName=two
+    AUTH_LDAP=truw
 
-{
-    'database': {
-        'one': {
-            'url': 'mysql1:3306,
-            'name': 'one'
+Would result in::
+
+    {
+        'database': {
+            'one': {
+                'url': 'mysql1:3306,
+                'name': 'one'
+            },
+            'two': {
+                'url': mysql2:3306,
+                'name': 'two'
+            }
         },
-        'two': {
-            'url': mysql2:3306,
-            'name': 'two'
-        }
-    },
-    'auth':
-        'ldap': 'true'
-}
+        'auth':
+            'ldap': 'true'
+    }
 """
 import os
 import sys

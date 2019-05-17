@@ -1,11 +1,5 @@
 #!/usr/bin/env python
-"""
-j2tmpl
-==========
-.. code:: shell
-  $ j2tmpl helloworld.tmpl helloworld.txt
-"""
-
+from j2tmpl import cli
 from setuptools import find_packages, setup
 
 install_requires = ["jinja2"]
@@ -18,7 +12,7 @@ setup(
     author_email="kogan@ohio.edu",
     url="https://github.com/ikogan/j2tmpl",
     description="Jinja2 templating based on environment variables.",
-    long_description=__doc__,
+    long_description=cli.__doc__,
     packages=find_packages(exclude=["tests"]),
     zip_safe=False,
     license="BSD",
