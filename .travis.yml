@@ -1,18 +1,37 @@
 language: python
 matrix:
   include:
-    - os: linux
-      python: 2.7
-    - os: linux
-      python: 3.5
-    - os: linux
-      python: 3.6
-    - os: linux
-      python: 3.7
-      dist: xenial
-    - os: osx
-      python: 2.7
+  - os: linux
+    python: 2.7
+  - os: linux
+    python: 3.5
+  - os: linux
+    python: 3.6
+  - os: linux
+    python: 3.7
+    dist: xenial
+install:
+- pip install twine
 script:
-  - python setup.py test
-  - python setup.py build
-  - pyinstaller -F j2tmpl/cli.py -n j2tmpl
+- python setup.py test
+- python setup.py build
+- python -OO -m PyInstaller -F j2tmpl/cli.py -n j2tmpl
+deploy:
+  - provider: releases
+    api_key:
+      secure: 0vPPGL190DT6HAEcgCzl/yOEnJJ7udSYLoBE+58dyc4LbcHcyj3hQCrU0Dbqc77kTiI3EfxJPCA/lzX94+0q7n69wxkXCYdGsYXY17+PQFw6jOElOumpiHsgnTFBWzJMCFBNwCKS02CG541FMAAemtkydnlX4Z4d6psnVY+izGai40M6lLf0KOuvxfevNTNy+Kdx9lX+Z9Xps/EXoduwN/XabTmyOWPL1Vye1PxFzA8OP0nkOKM0rUgbzQ/Lr+94PJruJEbvLJZAORd5LL5E5RSe/5K5mCS4fipRgX0YxJViggi23PHNgqoV+IypJylI38NO39JMbi13tHXYdI6mHdM17DidvnnXzGGMsJJGoSCJNHD2YyHz8hDO4DQmDeNkpv0Ft/yIUCDNn3UQitgioyJF7A1anJWE+gYYRxejT7ZmKU9X8P5wMV02666DkkiP1/envBoYjsaE63fzAooA1aKrO+jR9jwl1mUjv5XLwKIC3kkLP8defHApKu5n8VrqC2CF+fZnkcMIoHk3a5gK/2XJY0rrNcCdHAeKkXHjNOuqCmcWoz+/VnYIs0vIDP2iuv4pGZ0eYbx9dTw8ZX2lF9zfCJWmFvaSm2RAYYM+V9UTDP7maoP3+TWmAe6iZDHugihlcBps5Pq+Zk+0a6yO3nD7ZU+WFp88bTTbmm1t0l0=
+    file: dist/j2tmpl
+    draft: true
+    overwrite: true
+    skip_cleanup: true
+    on:
+      repo: ikogan/j2tmpl
+      tags: true
+  - provider: pypi
+    user: ikogan
+    password:
+      secure: DHuaLSXhDNNv13aVk1oIf9XCk5ieALFZlLh5A2+s9hNQoXOvEL4LkKPaAnNKNzQrWOgVcVkPPd7lziX+t3ts3622Wg3RObLQ/N2bjqgv2MjkPG4YuwJRzrhfcDhhiv9dkDVF4yjGyxPAT5z80vwstXtoBb0TMSKMSjd1+NJk6KrBcB4q3wJq2DfHrAxx+NH+8Lb478siV3pXyK2BGVbSpVDJQzxOddvnfM7k7Fb0WJMDofKU3N99/87aV1L2EiZB8GIJIiLxLx/70Er70lCklF9NNaTw5b5tzZL8YdtAJbG65vUIUEDmsm2a4I1/yiU4CWc8KtTFTFH+mA3bcA8w1KHqDi97YBsWmUuJzfhpTtyRv4Ume0YTTME+Qg6BzOo7DDIn1vfu0Lf/xayXwMBeZULIhffarubgppW/duh77cu/0DhQbeOXl3vgYiGA8/AhMulza1mC7ymNY5GoVCtVl1vO9cIk0mleaqTuyAMh973WCg5ChIK8AViVnJBSaaDJ1Srjq4ERWkfIoRu99cwNJ8qqsam4YlI6neLdGDIrn66QAlGD+p9wSywEu4WNUwMKYTLD7wKis8CB+3Ua9R2aVcmoWQa0v4Kw95UT2Br3zGrY5nMHcsuuNYVmrIBk3mew2mdX6I/yo8E7WQ2La1LmyONiVELxK1S4Ivm02D0Vcvs=
+    skip_existing: true
+    on:
+      repo: ikogan/j2tmpl
+      tags: true

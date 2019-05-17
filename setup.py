@@ -32,9 +32,15 @@ setup(
     include_package_data=True,
     entry_points={"console_scripts": ["j2tmpl = j2tmpl:main"]},
     classifiers=[
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Intended Audience :: System Administrators",
         "Operating System :: OS Independent",
         "Topic :: Software Development",
+        "License :: MIT License",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
     ],
 )
