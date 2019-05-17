@@ -12,24 +12,32 @@ def build_template_context(raw_context):
 
     for k, v in raw_context.items():
         originalKey = k
-        k = re.sub('([a-z])([A-Z])', r'\1_\2', k).lower()
-        keys = ['_'] if k == '_' else re.sub('_+', '_', k).split('_')
+        k = re.sub('_+', '_', re.sub('([a-z])([A-Z])', r'\1_\2', k).lower())
+        keys = ['_'] if k == '_' else list(
+            filter(lambda x: len(x) > 0, k.split('_')))
 
         currentLevel = context
         for level in range(0, len(keys)):
             levelKey = keys[level].lower()
 
-            if len(levelKey) == 0:
-                levelKey = '_'
+            if levelKey in currentLevel.keys():
+                if type(currentLevel[levelKey]) == dict:
+                    if level == len(keys) - 1:
+                        if '_' in currentLevel[levelKey]:
+                            raise ValueError('%s is defined multiple times.' % (originalKey))  # noqa: E501
 
-            if levelKey in currentLevel.keys() and \
-                    (type(currentLevel[levelKey]) != dict
-                        or level == len(keys) - 1):
-                raise ValueError('%s is defined multiple times or at a lower level at %s.' % (originalKey, levelKey))  # noqa: E501
+                        currentLevel[levelKey]['_'] = v
+                else:
+                    if level == len(keys) - 1:
+                        raise ValueError('%s is defined multiple times.' % (originalKey))  # noqa: E501
 
-            if level == len(keys) - 1:
+                    currentValue = currentLevel[levelKey]
+                    currentLevel[levelKey] = {
+                        '_': currentValue
+                    }
+            elif level == len(keys) - 1:
                 currentLevel[levelKey] = v
-            elif levelKey not in currentLevel.keys():
+            else:
                 currentLevel[levelKey] = {}
 
             currentLevel = currentLevel[levelKey]

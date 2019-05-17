@@ -14,7 +14,10 @@ def test_simple_template(tmp_path, common_environment):
 
     cli.render(args, raw_context=common_environment)
 
-    assert output.read_text() == """LANG=en_US.UTF-8
+    assert output.read_text() == """_=whatisthis
+LANG=en_US.UTF-8
+TERM_PROGRAM=vscode
+TERM_PROGRAM_VERSION=7
 XPC_FLAGS=0x0
 CAMEL_CASE_VARIABLE=handlethistoo
 JAVA_camelCaseVariable=thisshouldbefun"""

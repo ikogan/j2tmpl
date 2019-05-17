@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Module",
+            "name": "Python: Test",
             "type": "python",
             "request": "launch",
-            "module": "pytest",
+            "module": "pytest"
         },
         {
             "name": "Python: Current File",

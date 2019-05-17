@@ -3,28 +3,43 @@ from j2tmpl import cli
 import pytest
 
 
-def test_parse_simple(simple_list):
-    assert len(simple_list.keys()) == 3
-    assert simple_list['a'] == 1
-    assert simple_list['b'] == 2
-    assert simple_list['c'] == 3
+def test_parse_simple():
+    context = cli.build_template_context({'A': 1, 'B': 2, 'C': 3})
+
+    assert len(context.keys()) == 3
+    assert context['a'] == 1
+    assert context['b'] == 2
+    assert context['c'] == 3
 
 
-def test_parse_object(simple_object):
-    assert len(simple_object.keys()) == 1
-    assert 'two' in simple_object['one'].keys()
-    assert 'three' in simple_object['one']['two'].keys()
-    assert simple_object['one']['two']['three'] == 4
+def test_parse_object():
+    context = cli.build_template_context({'ONE_TWO_THREE': 4})
+
+    assert len(context.keys()) == 1
+    assert 'two' in context['one'].keys()
+    assert 'three' in context['one']['two'].keys()
+    assert context['one']['two']['three'] == 4
 
 
-def test_single_underscore(single_underscore):
-    assert len(single_underscore.keys()) == 1
-    assert single_underscore['_'] == 'underscore'
+def test_single_underscore():
+    context = cli.build_template_context({'_': 'underscore'})
+
+    assert len(context.keys()) == 1
+    assert context['_'] == 'underscore'
+
+    context = cli.build_template_context({'______': 'underscore'})
+
+    assert len(context.keys()) == 1
+    assert context['_'] == 'underscore'
 
 
-def test_many_underscores(many_underscores):
-    assert len(many_underscores.keys()) == 1
-    assert many_underscores['_']['test']['variable']['seven']['_'] == 'weee'
+def test_many_underscores():
+    context = cli.build_template_context({
+        '__TEST_VARIABLE__SEVEN__': 'weee'
+    })
+
+    assert len(context.keys()) == 1
+    assert context['test']['variable']['seven'] == 'weee'
 
 
 def test_duplicate_keys_error():
@@ -35,4 +50,16 @@ def test_duplicate_keys_error():
             'oneTwoThree': 'failure'
         })
 
-    assert 'ONE_TWO is defined multiple times' in str(excinfo.value)
+    assert 'oneTwoThree is defined multiple times' in str(excinfo.value)
+
+    # This is a slightly different code path. If the duplication
+    # is in the middle of the largest similar key, it's caught in
+    # a different place.
+    with pytest.raises(ValueError) as excinfo:
+        cli.build_template_context({
+            'ONE_TWO_THREE': 'one',
+            'ONE_TWO': 'two',
+            'oneTwo': 'failure'
+        })
+
+    assert 'oneTwo is defined multiple times' in str(excinfo.value)
