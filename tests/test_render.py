@@ -6,7 +6,7 @@ TEST_TEMPLATE_PATH = os.path.join(os.getcwd(), "tests", "templates")
 
 
 def test_simple_template(tmp_path, common_environment):
-    output = os.path.join(tmp_path, "unit.output")
+    output = tmp_path/'unit.output'
     args = Namespace(
         template=os.path.join(TEST_TEMPLATE_PATH, "simple.jinja"),
         output=output,
