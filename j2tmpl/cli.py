@@ -15,7 +15,7 @@ For example:
     DATABASE_ONE_NAME=one
     databaseTwoUrl=mysql2:3306
     databaseTwoName=two
-    AUTH_LDAP=truw
+    AUTH_LDAP=true
 
 Would result in:
 
