@@ -14,14 +14,14 @@ Becomes:
 
 ```json
 {
-    "database": {
-        "main": {
-            "uri": "mysql:3306"
-            "username": "app"
+    'database': {
+        'main': {
+            'uri': 'mysql:3306'
+            'username': 'app'
         },
-        "cache": {
-            "uri": "redis:6379"
-            "username": "app"
+        'cache': {
+            'uri': 'redis:6379'
+            'username': 'app'
         }
     }
 }
