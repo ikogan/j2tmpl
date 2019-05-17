@@ -7,7 +7,9 @@ This will parse the current environment into a dictionary
 tree where each key is split along underscores or
 camelcase and each element is added a sub-dictionary.
 
-For example::
+For example:
+
+.. code-block:: shell
 
     DATABASE_ONE_URL=mysql:3306
     DATABASE_ONE_NAME=one
@@ -15,7 +17,9 @@ For example::
     databaseTwoName=two
     AUTH_LDAP=truw
 
-Would result in::
+Would result in:
+
+.. code-block:: json
 
     {
         'database': {
@@ -31,6 +35,11 @@ Would result in::
         'auth':
             'ldap': 'true'
     }
+
+.. code-block:: shell
+
+    $ j2tmpl template.jinja
+    $ j2tmpl --help
 """
 import os
 import sys

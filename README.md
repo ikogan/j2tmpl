@@ -49,7 +49,7 @@ DATABASE_CACHE_USERNAME=app
 
 A template would have to use them in the following way:
 
-```jinja2
+```jinja
 databases: {
     main: {
         uri: {{ DATABASE_MAIN_URI }}
@@ -64,7 +64,7 @@ your container will have? This construct makes it diffcult in those
 instances where you have to define *N* things differently depending
 on a container deployment, or for base images.
 
-```jinja2
+```jinja
 databases: {
     {% for name,definition in databases.items() %}
     {{ name }}: {
@@ -91,7 +91,7 @@ In the template context, `{{ auth.ldap }}` has to be an object as
 `AUTH_LDAP` will be moved down into a special `_` key. The two
 variables would then be:
 
-```jinja2
+```jinja
 {{ auth.ldap._ }}=true
 {{ auth.ldap.username }}=app
 ```
