@@ -45,8 +45,26 @@ import os
 import sys
 import re
 
-from jinja2 import Template
+from jinja2 import Environment
 from argparse import ArgumentParser
+
+
+def read_file_filter(filename):
+    """
+    Jinja filter that reads the contents of a file into the template
+    given the filename.
+    """
+    with open(filename) as f:
+        return f.read()
+
+
+ENVIRONMENT = Environment(
+                 trim_blocks=True,
+                 lstrip_blocks=True,
+                 extensions=['jinja2.ext.do', 'jinja2.ext.loopcontrols']
+)
+
+ENVIRONMENT.filters['readfile'] = read_file_filter
 
 
 def build_template_context(raw_context):
@@ -109,7 +127,7 @@ def render(args, raw_context=os.environ):
         output = open(args.output, 'w') \
             if args.output else sys.stdout
 
-        Template(template).stream(context).dump(output)
+        ENVIRONMENT.from_string(template).stream(context).dump(output)
 
         if args.output:
             output.close()
