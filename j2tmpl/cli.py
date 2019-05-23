@@ -187,7 +187,9 @@ def render(path, output, context, args):
 
                     # Our target path still has the template extension on it since we're processing
                     # a fragment directory, need to split it off again.
-                    render_file(template, context, output=os.path.splitext(target_entry_path)[0], verbose=args.verbose)
+                    render_file(template, context,
+                                output=os.path.splitext(target_entry_path)[0],
+                                verbose=args.verbose)
                 elif args.recursive:
                     render(entry_path,
                            os.path.join(output_path, entry) if output_path else None,
@@ -203,7 +205,8 @@ def render(path, output, context, args):
 def main():  # pragma: no cover
     parser = ArgumentParser()
     parser.add_argument("template", help="Jinja template file or directory to render.")
-    parser.add_argument("-r", "--recursive", help="Render templates in subdirectories recursively.", default=False)
+    parser.add_argument("-r", "--recursive", help="Render templates in subdirectories recursively.",
+                        default=False)
     parser.add_argument("-v", "--verbose", default=False)
     parser.add_argument("-o", "--output",
             help="Destination file to write. If omitted, will output to stdout.")  # noqa: E128,E501
