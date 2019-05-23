@@ -45,8 +45,20 @@ import os
 import sys
 import re
 
-from jinja2 import Environment
+from jinja2 import Environment, Undefined
 from argparse import ArgumentParser
+
+
+class PermissiveUndefined(Undefined):
+    """
+    A more permissive undefined that also also allows
+    __getattr__. This allows `default`to work across
+    the entire complex object.
+    """
+    def __getattr__(self, name):
+        if name[:2] == '__':
+            raise AttributeError(name)
+        return self
 
 
 def read_file_filter(filename):
@@ -61,6 +73,7 @@ def read_file_filter(filename):
 ENVIRONMENT = Environment(
                  trim_blocks=True,
                  lstrip_blocks=True,
+                 undefined=PermissiveUndefined,
                  extensions=['jinja2.ext.do', 'jinja2.ext.loopcontrols']
 )
 
@@ -115,32 +128,92 @@ def build_template_context(raw_context):
     return context
 
 
-def render(args, raw_context=os.environ):
+def render_file(template, context, output=None, verbose=False):
+    if verbose:
+        print("Rendering", template, "to", output if output else "standard out")
+
+    output = open(output, 'w') \
+        if output else sys.stdout
+
+    ENVIRONMENT.from_string(template).stream(context).dump(output)
+
+    if output:
+        output.close()
+
+
+def render(path, output, context, args):
     """
     Render a template based on the arguments and
     the given `raw_context`, which, by default
     is the OS environment.
     """
-    with open(args.template) as templateFile:
-        context = build_template_context(raw_context)
-        template = templateFile.read()
-        output = open(args.output, 'w') \
-            if args.output else sys.stdout
+    if os.path.isdir(path):
+        # Make sure we have the full real path for later
+        # comparisons.
+        path = os.path.realpath(path)
+        output_path = os.path.realpath(output) if output is not None else None
 
-        ENVIRONMENT.from_string(template).stream(context).dump(output)
+        if output_path is not None:
+            os.makedirs(output_path, exist_ok=True)
 
-        if args.output:
-            output.close()
+        # So we could use os.walk here but we need to control
+        # what we do with directories based on the name so
+        # it's actually easier not to.
+        for entry in os.listdir(path):
+            # Figure out the paths to the current file, the target
+            # file, and the file extension of the current file.
+            entry_path = os.path.realpath(os.path.join(path, entry))
+            target_entry, extension = os.path.splitext(entry)
+            target_entry_path = os.path.realpath(os.path.join(path, target_entry))
+
+            # For directories, we either have to descend into them, or
+            # we need to process them as fragments, depending on their
+            # name.
+            if os.path.isdir(entry_path):
+                if extension == '.d' and \
+                   os.path.splitext(target_entry)[1] in args.template_extensions:
+                    # First, we'll read in the template if it exists, then
+                    # each fragment in the fragment directory.
+                    template = ""
+
+                    if os.path.isfile(target_entry):
+                        with open(target_entry) as templateFile:
+                            template += templateFile.read()
+
+                    for fragment in os.listdir(entry_path):
+                        if os.path.splitext(fragment)[1] in args.template_extensions:
+                            with open(fragment) as templateFile:
+                                template += templateFile.read()
+
+                    # Our target path still has the template extension on it since we're processing
+                    # a fragment directory, need to split it off again.
+                    render_file(template, context, output=os.path.splitext(target_entry_path)[0], verbose=args.verbose)
+                elif args.recursive:
+                    render(entry_path,
+                           os.path.join(output_path, entry) if output_path else None,
+                           context, args)
+            elif extension in args.template_extensions and not os.path.isdir(entry_path + ".d"):
+                with open(path) as templateFile:
+                    render_file(templateFile.read(), context, output=target_entry_path, verbose=args.verbose)
+    else:
+        with open(path) as templateFile:
+            render_file(templateFile.read(), context, output=output_path, verbose=args.verbose)
 
 
 def main():  # pragma: no cover
     parser = ArgumentParser()
-    parser.add_argument("template", help="Jinja template file to render.")
+    parser.add_argument("template", help="Jinja template file or directory to render.")
+    parser.add_argument("-r", "--recursive", help="Render templates in subdirectories recursively.", default=False)
+    parser.add_argument("-v", "--verbose", default=False)
     parser.add_argument("-o", "--output",
             help="Destination file to write. If omitted, will output to stdout.")  # noqa: E128,E501
+    parser.add_argument("--template-extensions",
+                        help="File extensions to interpret as template files (JINJA_TEMPLATE_EXTENSIONS).",  # noqa: E128,E501
+                        dest="template_extensions", default=getattr(
+                            os.environ, 'JINJA_TEMPLATE_EXTENSIONS', 'tmpl,jinja,jinja2,jnj,j2'))
     args = parser.parse_args()
 
-    render(args)
+    render(args.template, args.output, build_template_context(os.environ), args)
 
 
 if __name__ == "__main__":  # pragma: no cover
