@@ -9,9 +9,10 @@ def test_simple_template(common_environment):
     # The tmp_path fixture is not relaible across Python versions.
     # Do this ourselves.
     tmpfile = NamedTemporaryFile()
-    with open(os.path.join(TEST_TEMPLATE_PATH, "simple.jinja")) as templateFile:
-        cli.render_file(templateFile.read(), cli.build_template_context(
-            common_environment), output=tmpfile.name)
+    templateFile = os.path.join(TEST_TEMPLATE_PATH, "simple.jinja")
+    cli.render(templateFile, tmpfile.name,
+               cli.build_template_context(common_environment),
+               cli.parse_arguments(['-o', tmpfile.name, templateFile]))
 
     output = open(tmpfile.name)
     assert output.read() == """_=whatisthis
@@ -27,9 +28,10 @@ JAVA_camelCaseVariable=thisshouldbefun"""
 
 def test_extensions(common_environment):
     tmpfile = NamedTemporaryFile()
-    with open(os.path.join(TEST_TEMPLATE_PATH, "extensions.jinja")) as templateFile:
-        cli.render_file(templateFile.read(), cli.build_template_context(
-            common_environment), output=tmpfile.name)
+    templateFile = os.path.join(TEST_TEMPLATE_PATH, "extensions.jinja")
+    cli.render(templateFile, tmpfile.name,
+               cli.build_template_context(common_environment),
+               cli.parse_arguments(['-o', tmpfile.name, templateFile]))
 
     output = open(tmpfile.name)
     assert output.read() == "en_US.UTF-8"
@@ -43,9 +45,10 @@ def test_filters(common_environment):
                                   'templates', 'test.data')
     context = cli.build_template_context(dict(common_environment,
                                               TEST_DATA_PATH=test_data_path))
+    templateFile = os.path.join(TEST_TEMPLATE_PATH, "filters.jinja")
 
-    with open(os.path.join(TEST_TEMPLATE_PATH, "filters.jinja")) as templateFile:
-        cli.render_file(templateFile.read(), context, output=tmpfile.name)
+    cli.render(templateFile, tmpfile.name, context,
+               cli.parse_arguments(['-o', tmpfile.name, templateFile]))
 
     output = open(tmpfile.name)
     assert output.read() == "TEST DATA"
@@ -53,9 +56,10 @@ def test_filters(common_environment):
 
 def test_undefined(common_environment):
     tmpfile = NamedTemporaryFile()
-    with open(os.path.join(TEST_TEMPLATE_PATH, "undefined.jinja")) as templateFile:
-        cli.render_file(templateFile.read(), cli.build_template_context(
-            common_environment), output=tmpfile.name)
+    templateFile = os.path.join(TEST_TEMPLATE_PATH, "undefined.jinja")
+    cli.render(templateFile, tmpfile.name,
+               cli.build_template_context(common_environment),
+               cli.parse_arguments(['-o', tmpfile.name, templateFile]))
 
     output = open(tmpfile.name)
     assert """7

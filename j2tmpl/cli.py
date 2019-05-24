@@ -130,7 +130,7 @@ def build_template_context(raw_context):
 
 def render_file(template, context, output=None, verbose=False):
     if verbose:
-        print("Rendering", template, "to", output if output else "standard out")
+        print("Rendering", template, "to", output if output else "standard out")  # pragma: no cover
 
     output = open(output, 'w') \
         if output else sys.stdout
@@ -147,12 +147,12 @@ def render(path, output, context, args):
     the given `raw_context`, which, by default
     is the OS environment.
     """
-    if os.path.isdir(path):
-        # Make sure we have the full real path for later
-        # comparisons.
-        path = os.path.realpath(path)
-        output_path = os.path.realpath(output) if output is not None else None
+    # Make sure we have the full real path for later
+    # comparisons.
+    path = os.path.realpath(path)
+    output_path = os.path.realpath(output) if output is not None else None
 
+    if os.path.isdir(path):
         if output_path is not None:
             os.makedirs(output_path, exist_ok=True)
 
@@ -195,7 +195,7 @@ def render(path, output, context, args):
                            os.path.join(output_path, entry) if output_path else None,
                            context, args)
             elif extension in args.template_extensions and not os.path.isdir(entry_path + ".d"):
-                with open(path) as templateFile:
+                with open(entry_path) as templateFile:
                     render_file(templateFile.read(), context, output=target_entry_path, verbose=args.verbose)
     else:
         with open(path) as templateFile:
@@ -205,7 +205,8 @@ def render(path, output, context, args):
 def parse_arguments(args=sys.argv):  # pragma: no cover
     parser = ArgumentParser()
     parser.add_argument("template", help="Jinja template file or directory to render.")
-    parser.add_argument("-r", "--recursive", help="Render templates in subdirectories recursively.",
+    parser.add_argument("-r", "--recursive", action="store_true",
+                        help="Render templates in subdirectories recursively.",
                         default=False)
     parser.add_argument("-v", "--verbose", default=False)
     parser.add_argument("-o", "--output",
@@ -215,7 +216,11 @@ def parse_arguments(args=sys.argv):  # pragma: no cover
                         dest="template_extensions", default=getattr(
                             os.environ, 'JINJA_TEMPLATE_EXTENSIONS', 'tmpl,jinja,jinja2,jnj,j2'))
 
-    return parser.parse_args(args=args)
+    args = parser.parse_args(args=args)
+
+    setattr(args, 'template_extensions', ["." + x for x in args.template_extensions.split(',')])
+
+    return args
 
 
 def main():  # pragma: no cover
