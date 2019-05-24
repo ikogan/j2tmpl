@@ -1,0 +1,14 @@
+{{ term.program.version }}
+{{ term.program.foo|default('term -> program -> foo(X)') }}
+{{ term.foo.bar|default('term -> foo(X) -> bar') }}
+{{ foo.bar.baz|default('foo(X) -> bar -> baz') }}
+
+{% if term.foo %}term -> foo{% endif %}
+{% if term.foo.bar %}term -> foo -> bar{% endif %}
+
+{% if term.foo is defined %}term -> foo is defined{% endif %}
+{% if term.foo.bar is defined %}term -> foo -> bar is defined{% endif %}
+
+{% if term.foo is not defined %}term -> foo is not defined{% endif %}
+
+{% if term.foo.bar is not defined %}term -> foo -> bar is not defined{% endif %}

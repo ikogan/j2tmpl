@@ -202,7 +202,7 @@ def render(path, output, context, args):
             render_file(templateFile.read(), context, output=output_path, verbose=args.verbose)
 
 
-def main():  # pragma: no cover
+def parse_arguments(args=sys.argv):  # pragma: no cover
     parser = ArgumentParser()
     parser.add_argument("template", help="Jinja template file or directory to render.")
     parser.add_argument("-r", "--recursive", help="Render templates in subdirectories recursively.",
@@ -214,7 +214,12 @@ def main():  # pragma: no cover
                         help="File extensions to interpret as template files (JINJA_TEMPLATE_EXTENSIONS).",  # noqa: E128,E501
                         dest="template_extensions", default=getattr(
                             os.environ, 'JINJA_TEMPLATE_EXTENSIONS', 'tmpl,jinja,jinja2,jnj,j2'))
-    args = parser.parse_args()
+
+    return parser.parse_args(args=args)
+
+
+def main():  # pragma: no cover
+    args = parse_arguments()
 
     render(args.template, args.output, build_template_context(os.environ), args)
 
