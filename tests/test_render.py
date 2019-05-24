@@ -1,4 +1,5 @@
 import os
+
 from j2tmpl import cli
 from tempfile import NamedTemporaryFile
 

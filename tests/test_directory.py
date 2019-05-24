@@ -38,7 +38,7 @@ def simple_directory(srcdir, dstdir, context):
     assert_comparisons(srcdir, dstdir, [
         ["test.conf.jinja", os.path.join(srcdir, "test.conf.jinja")],
         [os.path.join("simple-subdirectory", "test.sub.jinja"),
-        os.path.join(srcdir, "simple-subdirectory", "test.sub.jinja")],
+         os.path.join(srcdir, "simple-subdirectory", "test.sub.jinja")],
         ["test.conf", os.path.join(rendereddir, "test.conf")]
     ])
     assert not os.path.exists(os.path.join(dstdir, "simple-subdirectory", "test.sub"))
@@ -110,7 +110,6 @@ def fragment_directory(srcdir, dstdir, context):
     assert not os.path.exists(os.path.join(dstdir, "fragment-subdirectory", "sub2.conf"))
 
 
-
 def test_fragment_directory(common_environment):
     tmpdir = TemporaryDirectory()
     tmpdestdir = TemporaryDirectory()
@@ -172,4 +171,3 @@ def test_fragment_directory_recursive_inplace(common_environment):
     tmpdir = TemporaryDirectory()
 
     fragment_directory_recursive(tmpdir.name, tmpdir.name, common_environment)
-
