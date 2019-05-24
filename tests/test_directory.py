@@ -1,7 +1,30 @@
 import os
 from j2tmpl import cli
-from tempfile import TemporaryDirectory
 from distutils.dir_util import copy_tree
+
+try:
+    from tempfile import TemporaryDirectory
+except ImportError:
+    import shutil
+    from tempfile import mkdtemp
+
+    # Note, taken from Python 3's implementation
+    # but simplified for just this use.
+    class TemporaryDirectory:
+        def __init__(self):
+            self.name = mkdtemp()
+
+        def __enter__(self):
+            return self.name
+
+        def __exit__(self, exc, value, tb):
+            self.cleanup()
+
+        def __del__(self):
+            self.cleanup()
+
+        def cleanup(self):
+            shutil.rmtree(self.name)
 
 TEST_TEMPLATE_PATH = os.path.join(os.getcwd(), "tests", "templates")
 

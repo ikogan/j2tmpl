@@ -154,7 +154,10 @@ def render(path, output, context, args):
 
     if os.path.isdir(path):
         if output_path is not None:
-            os.makedirs(output_path, exist_ok=True)
+            if not os.path.exists(output_path):
+                os.makedirs(output_path)
+            elif not os.path.isdir(output_path):
+                raise OSError("%s already exists and is not a directory" % (output_path))
 
         # So we could use os.walk here but we need to control
         # what we do with directories based on the name so
