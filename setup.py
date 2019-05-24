@@ -39,7 +39,10 @@ Would result in:
 .. code-block:: shell
 
     $ j2tmpl template.jinja
+    $ j2tmpl templatedir/
     $ j2tmpl --help
+
+See the GitHub README for more details.
 """
 from setuptools import find_packages, setup
 
@@ -48,7 +51,7 @@ tests_requires = ["pytest", "flake8", "pytest-cover", "pytest-flake8"]
 
 setup(
     name="j2tmpl",
-    version="0.0.2",
+    version="0.0.3",
     author="Ilya Kogan",
     author_email="kogan@ohio.edu",
     url="https://github.com/ikogan/j2tmpl",
