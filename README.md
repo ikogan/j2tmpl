@@ -122,6 +122,62 @@ Note that the prebuilt binaries include the entire Python interpreter
 so they can be used just as easily as
 [confd](https://github.com/kelseyhightower/confd).
 
+## Usage
+
+This can be used in two ways: processing a single file, or an entire directory.
+
+When a directory path is passed as the template file,
+`j2tmpl` will scan the directory for any files with
+an extension matching `template-extensions`, an argument than
+defaults to `tmpl,jinja,jinja2,j2,jnj`.
+
+> Note that it will _still_ output to stdout unless `-o` is used.
+> If it is, then make sure it's a directory as well. If the
+> target directory doesn't exist, it will be created.
+
+In addition to files matching that pattern, any _directory_
+that matches that pattern and also ends with `.d` will be
+scanned for template fragments. Template files as well
+as files in `.d` directories that end in those extensions will
+all be concatenated together and rendered into one output file
+that matches the name of the directory without the template
+extension and without `.d`.
+
+For example, given the following directory structure:
+
+```
+foo.conf.jinja.d/
+    foo-1.jinja
+    foo-2.jinja
+bar.conf.jinja.d/
+    bar-1.jinja
+    bar-2.jinja
+foo.conf.jinja
+baz.conf.jinja
+```
+
+The output directory will contain the following:
+
+```
+bar.conf
+baz.conf
+foo.conf
+```
+
+## Built-In Filters and extensions
+
+Jinja's [do](http://jinja.pocoo.org/docs/2.10/extensions/#expression-statement)
+and [loopcontrols](http://jinja.pocoo.org/docs/2.10/extensions/#loop-controls)
+extensions are enabled by default as are
+the [trim_blocks](http://jinja.pocoo.org/docs/2.10/api/#jinja2.Environment)
+and [lstrip_blocks](http://jinja.pocoo.org/docs/2.10/api/#jinja2.Environment)
+
+Finally, the following additionals filters are avilable:
+
+**readfile(str)**:
+    Read in the contents of the file represented by `str`. This is particularly
+    useful for container secrets.
+
 ## Why not confd?
 
 Speaking of confd, why not just use it? While confd is great, it can
