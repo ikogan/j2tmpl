@@ -176,13 +176,14 @@ def render(path, output, context, args):
                     # each fragment in the fragment directory.
                     template = ""
 
-                    if os.path.isfile(target_entry):
-                        with open(target_entry) as templateFile:
+                    if os.path.isfile(target_entry_path):
+                        with open(target_entry_path) as templateFile:
                             template += templateFile.read()
 
                     for fragment in os.listdir(entry_path):
                         if os.path.splitext(fragment)[1] in args.template_extensions:
-                            with open(fragment) as templateFile:
+                            fragment_path = os.path.join(entry_path, fragment)
+                            with open(fragment_path) as templateFile:
                                 template += templateFile.read()
 
                     # Our target path still has the template extension on it since we're processing

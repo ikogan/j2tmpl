@@ -81,3 +81,95 @@ def test_simple_directory_recursive_inplace(common_environment):
     tmpdir = TemporaryDirectory()
 
     simple_directory_recursive(tmpdir.name, tmpdir.name, common_environment)
+
+
+def fragment_directory(srcdir, dstdir, context):
+    templatedir, rendereddir = render_directory(srcdir, dstdir, context, "fragment-directory")
+
+    assert_comparisons(srcdir, dstdir, [
+        ["test.conf.jinja", os.path.join(srcdir, "test.conf.jinja")],
+        [os.path.join("fragment-subdirectory", "sub.conf.jinja"),
+         os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja")],
+        [os.path.join("fragment-subdirectory", "sub2.conf.jinja"),
+         os.path.join(srcdir, "fragment-subdirectory", "sub2.conf.jinja")],
+        [os.path.join("fragment-subdirectory", "sub.conf.jinja.d", "subfragment.jinja"),
+         os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment.jinja")],
+        [os.path.join("fragment-subdirectory", "sub.conf.jinja.d", "subfragment2.jinja"),
+         os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment2.jinja")],
+        [os.path.join("test.conf.jinja.d", "fragment.jinja"),
+         os.path.join(srcdir, "test.conf.jinja.d", "fragment.jinja")],
+        [os.path.join("test.conf.jinja.d", "fragment2.conf.jinja"),
+         os.path.join(srcdir, "test.conf.jinja.d", "fragment2.conf.jinja")],
+        [os.path.join("nobase.conf.jinja.d", "nobase.conf.jinja"),
+         os.path.join(srcdir, "nobase.conf.jinja.d", "nobase.conf.jinja")],
+        ["test.conf", os.path.join(rendereddir, "test.conf")],
+        ["test2.conf", os.path.join(rendereddir, "test2.conf")],
+        ["nobase.conf", os.path.join(rendereddir, "nobase.conf")]
+    ])
+    assert not os.path.exists(os.path.join(dstdir, "fragment-subdirectory", "sub.conf"))
+    assert not os.path.exists(os.path.join(dstdir, "fragment-subdirectory", "sub2.conf"))
+
+
+
+def test_fragment_directory(common_environment):
+    tmpdir = TemporaryDirectory()
+    tmpdestdir = TemporaryDirectory()
+
+    fragment_directory(tmpdir.name, tmpdestdir.name, common_environment)
+
+
+def test_fragment_directory_inplace(common_environment):
+    tmpdir = TemporaryDirectory()
+
+    fragment_directory(tmpdir.name, tmpdir.name, common_environment)
+
+
+def fragment_directory_recursive(srcdir, dstdir, context):
+    templatedir, rendereddir = render_directory(srcdir, dstdir, context, "fragment-directory", recursive=True)
+
+    assert_comparisons(srcdir, dstdir, [
+        ["test.conf.jinja", os.path.join(srcdir, "test.conf.jinja")],
+        [os.path.join("fragment-subdirectory", "sub.conf.jinja"),
+         os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja")],
+        [os.path.join("fragment-subdirectory", "sub2.conf.jinja"),
+         os.path.join(srcdir, "fragment-subdirectory", "sub2.conf.jinja")],
+        [os.path.join("fragment-subdirectory", "sub.conf.jinja.d", "subfragment.jinja"),
+         os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment.jinja")],
+        [os.path.join("fragment-subdirectory", "sub.conf.jinja.d", "subfragment2.jinja"),
+         os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment2.jinja")],
+        [os.path.join("test.conf.jinja.d", "fragment.jinja"),
+         os.path.join(srcdir, "test.conf.jinja.d", "fragment.jinja")],
+        [os.path.join("test.conf.jinja.d", "fragment2.conf.jinja"),
+         os.path.join(srcdir, "test.conf.jinja.d", "fragment2.conf.jinja")],
+        [os.path.join("nobase.conf.jinja.d", "nobase.conf.jinja"),
+         os.path.join(srcdir, "nobase.conf.jinja.d", "nobase.conf.jinja")],
+        ["test.conf", os.path.join(rendereddir, "test.conf")],
+        ["test2.conf", os.path.join(rendereddir, "test2.conf")],
+        ["nobase.conf", os.path.join(rendereddir, "nobase.conf")],
+        [os.path.join("fragment-subdirectory", "sub.conf.jinja"),
+            os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja")],
+        [os.path.join("fragment-subdirectory", "sub2.conf.jinja"),
+            os.path.join(srcdir, "fragment-subdirectory", "sub2.conf.jinja")],
+        [os.path.join("fragment-subdirectory", "sub.conf.jinja.d", "subfragment.jinja"),
+            os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment.jinja")],
+        [os.path.join("fragment-subdirectory", "sub.conf.jinja.d", "subfragment2.jinja"),
+            os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment2.jinja")],
+        [os.path.join("fragment-subdirectory", "sub.conf"),
+            os.path.join(srcdir, "fragment-subdirectory", "sub.conf")],
+        [os.path.join("fragment-subdirectory", "sub2.conf"),
+            os.path.join(srcdir, "fragment-subdirectory", "sub2.conf")],
+    ])
+
+
+def test_fragment_directory_recursive(common_environment):
+    tmpdir = TemporaryDirectory()
+    tmpdestdir = TemporaryDirectory()
+
+    fragment_directory_recursive(tmpdir.name, tmpdestdir.name, common_environment)
+
+
+def test_fragment_directory_recursive_inplace(common_environment):
+    tmpdir = TemporaryDirectory()
+
+    fragment_directory_recursive(tmpdir.name, tmpdir.name, common_environment)
+
