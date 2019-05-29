@@ -12,6 +12,7 @@ matrix:
     dist: xenial
 install:
 - pip install pyinstaller jinja2
+- apt-get install -y upx
 script:
 - python setup.py test
 - python setup.py build

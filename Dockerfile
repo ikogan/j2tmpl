@@ -1,9 +1,11 @@
-FROM python:3
+FROM python:3.7
 
-COPY j2tmpl /app/j2tmpl
-COPY tests /app/tests
+RUN apt-get update && apt-get install -y upx && rm -rf /var/lib/apt/lists/*
+
 COPY setup.* /app/
 COPY build.sh /app
+COPY j2tmpl /app/j2tmpl
+COPY tests /app/tests
 
 RUN chmod +x /app/build.sh
 
