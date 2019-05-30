@@ -51,6 +51,7 @@ from jinja2 import Environment, Undefined
 from jinja2.exceptions import TemplateSyntaxError
 from argparse import ArgumentParser
 
+
 class PermissiveUndefined(Undefined):
     """
     A more permissive undefined that also also allows
