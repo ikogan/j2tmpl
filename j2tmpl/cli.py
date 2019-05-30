@@ -41,6 +41,8 @@ Would result in:
     $ j2tmpl template.jinja
     $ j2tmpl --help
 """
+from __future__ import print_function
+
 import os
 import sys
 import re
@@ -48,7 +50,6 @@ import re
 from jinja2 import Environment, Undefined
 from jinja2.exceptions import TemplateSyntaxError
 from argparse import ArgumentParser
-
 
 class PermissiveUndefined(Undefined):
     """
