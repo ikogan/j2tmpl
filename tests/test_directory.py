@@ -31,8 +31,6 @@ TEST_TEMPLATE_PATH = os.path.join(os.getcwd(), "tests", "templates")
 
 def assert_comparisons(tmpdir, tmpdestdir, comparisons):
     for srcpath, destpath in comparisons:
-        srcpath = os.path.join(tmpdir, srcpath)
-
         with open(srcpath) as src, open(destpath) as dest:
             assert src.read() == dest.read()
 
@@ -59,10 +57,11 @@ def simple_directory(srcdir, dstdir, context):
     templatedir, rendereddir = render_directory(srcdir, dstdir, context, "simple-directory")
 
     assert_comparisons(srcdir, dstdir, [
-        ["test.conf.jinja", os.path.join(srcdir, "test.conf.jinja")],
-        [os.path.join("simple-subdirectory", "test.sub.jinja"),
+        [os.path.join(templatedir, "test.conf.jinja"),
+            os.path.join(srcdir, "test.conf.jinja")],
+        [os.path.join(templatedir, "simple-subdirectory", "test.sub.jinja"),
          os.path.join(srcdir, "simple-subdirectory", "test.sub.jinja")],
-        ["test.conf", os.path.join(rendereddir, "test.conf")]
+        [os.path.join(rendereddir, "test.conf"), os.path.join(dstdir, "test.conf")]
     ])
     assert not os.path.exists(os.path.join(dstdir, "simple-subdirectory", "test.sub"))
 
@@ -84,12 +83,13 @@ def simple_directory_recursive(srcdir, dstdir, context):
     templatedir, rendereddir = render_directory(srcdir, dstdir, context, "simple-directory", recursive=True)
 
     assert_comparisons(srcdir, dstdir, [
-        ["test.conf.jinja", os.path.join(srcdir, "test.conf.jinja")],
-        [os.path.join("simple-subdirectory", "test.sub.jinja"),
+        [os.path.join(templatedir, "test.conf.jinja"),
+            os.path.join(srcdir, "test.conf.jinja")],
+        [os.path.join(templatedir, "simple-subdirectory", "test.sub.jinja"),
          os.path.join(srcdir, "simple-subdirectory", "test.sub.jinja")],
-        ["test.conf", os.path.join(rendereddir, "test.conf")],
-        [os.path.join("simple-subdirectory", "test.sub"),
-         os.path.join(srcdir, "simple-subdirectory", "test.sub")],
+        [os.path.join(rendereddir, "test.conf"), os.path.join(dstdir, "test.conf")],
+        [os.path.join(rendereddir, "simple-subdirectory", "test.sub"),
+         os.path.join(dstdir, "simple-subdirectory", "test.sub"), ],
     ])
 
 
@@ -110,24 +110,25 @@ def fragment_directory(srcdir, dstdir, context):
     templatedir, rendereddir = render_directory(srcdir, dstdir, context, "fragment-directory")
 
     assert_comparisons(srcdir, dstdir, [
-        ["test.conf.jinja", os.path.join(srcdir, "test.conf.jinja")],
-        [os.path.join("fragment-subdirectory", "sub.conf.jinja"),
+        [os.path.join(templatedir, "test.conf.jinja"),
+         os.path.join(srcdir, "test.conf.jinja")],
+        [os.path.join(templatedir, "fragment-subdirectory", "sub.conf.jinja"),
          os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja")],
-        [os.path.join("fragment-subdirectory", "sub2.conf.jinja"),
+        [os.path.join(templatedir, "fragment-subdirectory", "sub2.conf.jinja"),
          os.path.join(srcdir, "fragment-subdirectory", "sub2.conf.jinja")],
-        [os.path.join("fragment-subdirectory", "sub.conf.jinja.d", "subfragment.jinja"),
+        [os.path.join(templatedir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment.jinja"),
          os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment.jinja")],
-        [os.path.join("fragment-subdirectory", "sub.conf.jinja.d", "subfragment2.jinja"),
+        [os.path.join(templatedir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment2.jinja"),
          os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment2.jinja")],
-        [os.path.join("test.conf.jinja.d", "fragment.jinja"),
+        [os.path.join(templatedir, "test.conf.jinja.d", "fragment.jinja"),
          os.path.join(srcdir, "test.conf.jinja.d", "fragment.jinja")],
-        [os.path.join("test.conf.jinja.d", "fragment2.conf.jinja"),
+        [os.path.join(templatedir, "test.conf.jinja.d", "fragment2.conf.jinja"),
          os.path.join(srcdir, "test.conf.jinja.d", "fragment2.conf.jinja")],
-        [os.path.join("nobase.conf.jinja.d", "nobase.conf.jinja"),
+        [os.path.join(templatedir, "nobase.conf.jinja.d", "nobase.conf.jinja"),
          os.path.join(srcdir, "nobase.conf.jinja.d", "nobase.conf.jinja")],
-        ["test.conf", os.path.join(rendereddir, "test.conf")],
-        ["test2.conf", os.path.join(rendereddir, "test2.conf")],
-        ["nobase.conf", os.path.join(rendereddir, "nobase.conf")]
+        [os.path.join(rendereddir, "test.conf"), os.path.join(dstdir, "test.conf")],
+        [os.path.join(rendereddir, "test2.conf"), os.path.join(dstdir, "test2.conf")],
+        [os.path.join(rendereddir, "nobase.conf"), os.path.join(dstdir, "nobase.conf")]
     ])
     assert not os.path.exists(os.path.join(dstdir, "fragment-subdirectory", "sub.conf"))
     assert not os.path.exists(os.path.join(dstdir, "fragment-subdirectory", "sub2.conf"))
@@ -150,36 +151,29 @@ def fragment_directory_recursive(srcdir, dstdir, context):
     templatedir, rendereddir = render_directory(srcdir, dstdir, context, "fragment-directory", recursive=True)
 
     assert_comparisons(srcdir, dstdir, [
-        ["test.conf.jinja", os.path.join(srcdir, "test.conf.jinja")],
-        [os.path.join("fragment-subdirectory", "sub.conf.jinja"),
+        [os.path.join(templatedir, "test.conf.jinja"),
+         os.path.join(srcdir, "test.conf.jinja")],
+        [os.path.join(templatedir, "fragment-subdirectory", "sub.conf.jinja"),
          os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja")],
-        [os.path.join("fragment-subdirectory", "sub2.conf.jinja"),
+        [os.path.join(templatedir, "fragment-subdirectory", "sub2.conf.jinja"),
          os.path.join(srcdir, "fragment-subdirectory", "sub2.conf.jinja")],
-        [os.path.join("fragment-subdirectory", "sub.conf.jinja.d", "subfragment.jinja"),
+        [os.path.join(templatedir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment.jinja"),
          os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment.jinja")],
-        [os.path.join("fragment-subdirectory", "sub.conf.jinja.d", "subfragment2.jinja"),
+        [os.path.join(templatedir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment2.jinja"),
          os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment2.jinja")],
-        [os.path.join("test.conf.jinja.d", "fragment.jinja"),
+        [os.path.join(templatedir, "test.conf.jinja.d", "fragment.jinja"),
          os.path.join(srcdir, "test.conf.jinja.d", "fragment.jinja")],
-        [os.path.join("test.conf.jinja.d", "fragment2.conf.jinja"),
+        [os.path.join(templatedir, "test.conf.jinja.d", "fragment2.conf.jinja"),
          os.path.join(srcdir, "test.conf.jinja.d", "fragment2.conf.jinja")],
-        [os.path.join("nobase.conf.jinja.d", "nobase.conf.jinja"),
+        [os.path.join(templatedir, "nobase.conf.jinja.d", "nobase.conf.jinja"),
          os.path.join(srcdir, "nobase.conf.jinja.d", "nobase.conf.jinja")],
-        ["test.conf", os.path.join(rendereddir, "test.conf")],
-        ["test2.conf", os.path.join(rendereddir, "test2.conf")],
-        ["nobase.conf", os.path.join(rendereddir, "nobase.conf")],
-        [os.path.join("fragment-subdirectory", "sub.conf.jinja"),
-            os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja")],
-        [os.path.join("fragment-subdirectory", "sub2.conf.jinja"),
-            os.path.join(srcdir, "fragment-subdirectory", "sub2.conf.jinja")],
-        [os.path.join("fragment-subdirectory", "sub.conf.jinja.d", "subfragment.jinja"),
-            os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment.jinja")],
-        [os.path.join("fragment-subdirectory", "sub.conf.jinja.d", "subfragment2.jinja"),
-            os.path.join(srcdir, "fragment-subdirectory", "sub.conf.jinja.d", "subfragment2.jinja")],
-        [os.path.join("fragment-subdirectory", "sub.conf"),
-            os.path.join(srcdir, "fragment-subdirectory", "sub.conf")],
-        [os.path.join("fragment-subdirectory", "sub2.conf"),
-            os.path.join(srcdir, "fragment-subdirectory", "sub2.conf")],
+        [os.path.join(rendereddir, "test.conf"), os.path.join(dstdir, "test.conf")],
+        [os.path.join(rendereddir, "test2.conf"), os.path.join(dstdir, "test2.conf")],
+        [os.path.join(rendereddir, "nobase.conf"), os.path.join(dstdir, "nobase.conf")],
+        [os.path.join(rendereddir, "fragment-subdirectory", "sub.conf"),
+         os.path.join(dstdir, "fragment-subdirectory", "sub.conf")],
+        [os.path.join(rendereddir, "fragment-subdirectory", "sub2.conf"),
+         os.path.join(dstdir, "fragment-subdirectory", "sub2.conf")],
     ])
 
 

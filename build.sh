@@ -2,8 +2,6 @@
 set -e
 
 if [[ -e /proc/1/cgroup ]] && (grep -q docker /proc/1/cgroup || grep -q user.slice /proc/1/cgroup); then
-    pip3 install pyinstaller jinja2
-
     find . -name '*.pyc' -delete
     rm -Rf dist/*
     python3 setup.py test

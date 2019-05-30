@@ -46,6 +46,7 @@ import sys
 import re
 
 from jinja2 import Environment, Undefined
+from jinja2.exceptions import TemplateSyntaxError
 from argparse import ArgumentParser
 
 
@@ -73,6 +74,7 @@ def read_file_filter(filename):
 ENVIRONMENT = Environment(
                  trim_blocks=True,
                  lstrip_blocks=True,
+                 keep_trailing_newline=True,
                  undefined=PermissiveUndefined,
                  extensions=['jinja2.ext.do', 'jinja2.ext.loopcontrols']
 )
@@ -128,14 +130,33 @@ def build_template_context(raw_context):
     return context
 
 
-def render_file(template, context, output=None, verbose=False):
-    if verbose:
-        print("Rendering", template, "to", output if output else "standard out")  # pragma: no cover
+def render_file(template, context, output=None, append=False, verbose=False):
+    if verbose:  # pragma: no cover
+        if output is None or template == output:
+            print("Rendering", template)
+        else:
+            print("Rendering", template, "to", output)
 
-    output = open(output, 'w') \
-        if output else sys.stdout
+    with open(template) as f:
+        output = open(output, 'a' if append else 'w') \
+            if output else sys.stdout
 
-    ENVIRONMENT.from_string(template).stream(context).dump(output)
+        try:
+            ENVIRONMENT.from_string(f.read()).stream(context).dump(output)
+        except TemplateSyntaxError as e:
+            source = e.source.splitlines()
+            columns = str(len(str(e.lineno + 1)))
+            index = e.lineno - 1
+
+            print("Error rendering %s: %s" % (template, e.message), file=sys.stderr)
+
+            if index > 0:
+                print(("%" + columns + "d:    %s") % (e.lineno - 1, source[index - 1]), file=sys.stderr)
+            print(("%" + columns + "d: >> %s") % (e.lineno, source[index]), file=sys.stderr)
+            if index < len(source):
+                print(("%" + columns + "d:    %s") % (e.lineno + 1, source[index + 1]), file=sys.stderr)
+
+            raise e
 
     if output:
         output.close()
@@ -166,44 +187,45 @@ def render(path, output, context, args):
             # Figure out the paths to the current file, the target
             # file, and the file extension of the current file.
             entry_path = os.path.realpath(os.path.join(path, entry))
-            target_entry, extension = os.path.splitext(entry)
-            target_entry_path = os.path.realpath(os.path.join(path, target_entry))
+            entry_name, extension = os.path.splitext(os.path.basename(entry))
+
+            if output_path is not None:
+                target_entry_path = os.path.realpath(os.path.join(output_path, entry_name))
+            else:
+                target_entry_path = None
 
             # For directories, we either have to descend into them, or
             # we need to process them as fragments, depending on their
             # name.
             if os.path.isdir(entry_path):
                 if extension == '.d' and \
-                   os.path.splitext(target_entry)[1] in args.template_extensions:
-                    # First, we'll read in the template if it exists, then
-                    # each fragment in the fragment directory.
-                    template = ""
+                   os.path.splitext(entry_name)[1] in args.template_extensions:
+                    if target_entry_path is None:
+                        fragment_target_path = None
+                    else:
+                        fragment_target_path = os.path.splitext(target_entry_path)[0]
 
-                    if os.path.isfile(target_entry_path):
-                        with open(target_entry_path) as templateFile:
-                            template += templateFile.read()
+                    fragment_base_template = os.path.splitext(entry_path)[0]
+                    if os.path.isfile(fragment_base_template):
+                        render_file(fragment_base_template, context,
+                                    output=fragment_target_path, verbose=args.verbose)
+                    elif fragment_target_path is not None and os.path.isfile(fragment_target_path):
+                        os.unlink(fragment_target_path)
 
-                    for fragment in os.listdir(entry_path):
+                    for fragment in sorted(os.listdir(entry_path)):
                         if os.path.splitext(fragment)[1] in args.template_extensions:
                             fragment_path = os.path.join(entry_path, fragment)
-                            with open(fragment_path) as templateFile:
-                                template += templateFile.read()
-
-                    # Our target path still has the template extension on it since we're processing
-                    # a fragment directory, need to split it off again.
-                    render_file(template, context,
-                                output=os.path.splitext(target_entry_path)[0],
-                                verbose=args.verbose)
+                            render_file(fragment_path, context,
+                                        output=fragment_target_path,
+                                        verbose=args.verbose, append=True)
                 elif args.recursive:
                     render(entry_path,
                            os.path.join(output_path, entry) if output_path else None,
                            context, args)
             elif extension in args.template_extensions and not os.path.isdir(entry_path + ".d"):
-                with open(entry_path) as templateFile:
-                    render_file(templateFile.read(), context, output=target_entry_path, verbose=args.verbose)
+                render_file(entry_path, context, output=target_entry_path, verbose=args.verbose)
     else:
-        with open(path) as templateFile:
-            render_file(templateFile.read(), context, output=output_path, verbose=args.verbose)
+        render_file(path, context, output=output_path, verbose=args.verbose)
 
 
 def parse_arguments(argv):  # pragma: no cover
@@ -212,7 +234,7 @@ def parse_arguments(argv):  # pragma: no cover
     parser.add_argument("-r", "--recursive", action="store_true",
                         help="Render templates in subdirectories recursively.",
                         default=False)
-    parser.add_argument("-v", "--verbose", default=False)
+    parser.add_argument("-v", "--verbose", action="store_true", default=False)
     parser.add_argument("-o", "--output",
             help="Destination file to write. If omitted, will output to stdout.")  # noqa: E128,E501
     parser.add_argument("--template-extensions",
@@ -230,7 +252,13 @@ def parse_arguments(argv):  # pragma: no cover
 def main(argv):  # pragma: no cover
     args = parse_arguments(argv)
 
-    render(args.template, args.output, build_template_context(os.environ), args)
+    try:
+        render(args.template, args.output, build_template_context(os.environ), args)
+    except TemplateSyntaxError:
+        sys.exit(1)
+    except Exception:
+        print(str(sys.exc_info()[1]), file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":  # pragma: no cover

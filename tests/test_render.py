@@ -1,5 +1,7 @@
 import os
+import pytest
 
+from jinja2.exceptions import TemplateSyntaxError
 from j2tmpl import cli
 from tempfile import NamedTemporaryFile
 
@@ -52,7 +54,7 @@ def test_filters(common_environment):
                cli.parse_arguments(['-o', tmpfile.name, templateFile]))
 
     output = open(tmpfile.name)
-    assert output.read() == "TEST DATA"
+    assert output.read() == "TEST DATA\n"
 
 
 def test_undefined(common_environment):
@@ -72,3 +74,17 @@ foo(X) -> bar -> baz
 
 term -> foo is not defined
 term -> foo -> bar is not defined""" == output.read()
+
+
+def test_error(common_environment, capsys):
+    tmpfile = NamedTemporaryFile()
+    templateFile = os.path.join(TEST_TEMPLATE_PATH, "error.jinja")
+
+    with pytest.raises(TemplateSyntaxError):
+        cli.render(templateFile, tmpfile.name,
+                   cli.build_template_context(common_environment),
+                   cli.parse_arguments(['-o', tmpfile.name, templateFile]))
+
+    captured = capsys.readouterr()
+    assert "error.jinja" in captured.err
+    assert " 9: >>" in captured.err
