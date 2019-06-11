@@ -73,6 +73,18 @@ def read_file_filter(filename):
         return f.read()
 
 
+def boolean_filter(value):
+    """
+    Jinja filter that returns a boolean value for a given
+    string. The following values are truthy:
+
+    true, yes, 1
+
+    Note that this is case insensitive.
+    """
+    return str(value).lower() in ['true', 'yes', '1']
+
+
 ENVIRONMENT = Environment(
                  trim_blocks=True,
                  lstrip_blocks=True,
@@ -82,6 +94,7 @@ ENVIRONMENT = Environment(
 )
 
 ENVIRONMENT.filters['readfile'] = read_file_filter
+ENVIRONMENT.filters['boolean'] = boolean_filter
 
 
 def build_template_context(raw_context):
@@ -155,7 +168,7 @@ def render_file(template, context, output=None, append=False, verbose=False):
             if index > 0:
                 print(("%" + columns + "d:    %s") % (e.lineno - 1, source[index - 1]), file=sys.stderr)
             print(("%" + columns + "d: >> %s") % (e.lineno, source[index]), file=sys.stderr)
-            if index < len(source):
+            if index < len(source)-1:
                 print(("%" + columns + "d:    %s") % (e.lineno + 1, source[index + 1]), file=sys.stderr)
 
             raise e

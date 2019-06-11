@@ -42,19 +42,34 @@ def test_extensions(common_environment):
     tmpfile.close()
 
 
-def test_filters(common_environment):
+def test_filter_readfile(common_environment):
     tmpfile = NamedTemporaryFile()
     test_data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                   'templates', 'test.data')
     context = cli.build_template_context(dict(common_environment,
                                               TEST_DATA_PATH=test_data_path))
-    templateFile = os.path.join(TEST_TEMPLATE_PATH, "filters.jinja")
+    templateFile = os.path.join(TEST_TEMPLATE_PATH, os.path.join("filters", "readfile.jinja"))
 
     cli.render(templateFile, tmpfile.name, context,
                cli.parse_arguments(['-o', tmpfile.name, templateFile]))
 
     output = open(tmpfile.name)
     assert output.read() == "TEST DATA\n"
+
+
+def test_filter_boolean(common_environment):
+    tmpfile = NamedTemporaryFile()
+    templateFile = os.path.join(TEST_TEMPLATE_PATH, os.path.join("filters", "boolean.jinja"))
+
+    cli.render(templateFile, tmpfile.name,
+               cli.build_template_context(common_environment),
+               cli.parse_arguments(['-o', tmpfile.name, templateFile]))
+
+    output = open(tmpfile.name)
+    lines = output.readlines()
+
+    for num, line in enumerate(lines, start=1):
+        assert len(line) == 0 or line.strip() == 'cool', ("test %d should have been truthy" % num)
 
 
 def test_undefined(common_environment):
@@ -88,3 +103,19 @@ def test_error(common_environment, capsys):
     captured = capsys.readouterr()
     assert "error.jinja" in captured.err
     assert " 9: >>" in captured.err
+
+
+def test_single_line_error(common_environment, capsys):
+
+    tmpfile = NamedTemporaryFile()
+    templateFile = os.path.join(TEST_TEMPLATE_PATH, "single-line-error.jinja")
+
+    with pytest.raises(TemplateSyntaxError):
+        cli.render(templateFile, tmpfile.name,
+                   cli.build_template_context(common_environment),
+                   cli.parse_arguments(['-o', tmpfile.name, templateFile]))
+
+    captured = capsys.readouterr()
+    assert "error.jinja" in captured.err
+    assert "1: >>" in captured.err
+    assert 3 == len(captured.err.split('\n'))

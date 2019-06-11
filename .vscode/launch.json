@@ -9,14 +9,6 @@
             "type": "python",
             "request": "launch",
             "module": "pytest"
-        },
-        {
-            "name": "Python: Current File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "args": ["tests/templates/simple.jinja"],
-            "console": "integratedTerminal"
         }
     ]
 }
