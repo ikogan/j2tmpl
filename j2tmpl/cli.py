@@ -55,7 +55,7 @@ from argparse import ArgumentParser
 class PermissiveUndefined(Undefined):
     """
     A more permissive undefined that also also allows
-    __getattr__. This allows `default`to work across
+    __getattr__. This allows `default` to work across
     the entire complex object.
     """
     def __getattr__(self, name):
@@ -69,6 +69,9 @@ def read_file_filter(filename):
     Jinja filter that reads the contents of a file into the template
     given the filename.
     """
+    if isinstance(filename, Undefined):
+        return filename
+
     with open(filename) as f:
         return f.read()
 
@@ -82,6 +85,9 @@ def boolean_filter(value):
 
     Note that this is case insensitive.
     """
+    if isinstance(value, Undefined):
+        return value
+
     return str(value).lower() in ['true', 'yes', '1']
 
 
@@ -278,9 +284,6 @@ def main(argv):  # pragma: no cover
     try:
         render(args.template, args.output, build_template_context(os.environ), args)
     except TemplateSyntaxError:
-        sys.exit(1)
-    except Exception:
-        print(str(sys.exc_info()[1]), file=sys.stderr)
         sys.exit(1)
 
 

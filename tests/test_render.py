@@ -116,7 +116,6 @@ def test_error(common_environment, capsys):
 
 
 def test_single_line_error(common_environment, capsys):
-
     tmpfile = NamedTemporaryFile()
     templateFile = os.path.join(TEST_TEMPLATE_PATH, "single-line-error.jinja")
 
