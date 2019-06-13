@@ -47,7 +47,7 @@ import os
 import sys
 import re
 
-from jinja2 import Environment, Undefined
+from jinja2 import Environment, Undefined, FileSystemLoader
 from jinja2.exceptions import TemplateSyntaxError
 from argparse import ArgumentParser
 
@@ -188,6 +188,11 @@ def render(path, output, context, args):
     path = os.path.realpath(path)
     output_path = os.path.realpath(output) if output is not None else None
 
+    # Modify the environment to include a loader if a template
+    # base directory was specified.
+    if args.template_base_directory is not None:
+        ENVIRONMENT.loader = FileSystemLoader(args.template_base_directory)
+
     if os.path.isdir(path):
         if output_path is not None:
             if not os.path.exists(output_path):
@@ -252,6 +257,9 @@ def parse_arguments(argv):  # pragma: no cover
     parser.add_argument("-v", "--verbose", action="store_true", default=False)
     parser.add_argument("-o", "--output",
             help="Destination file to write. If omitted, will output to stdout.")  # noqa: E128,E501
+    parser.add_argument("-b", "--template-base-directory",
+                        help="Add a base directory to lookup templates when using includes.",
+                        dest="template_base_directory", default=None)
     parser.add_argument("--template-extensions",
                         help="File extensions to interpret as template files (JINJA_TEMPLATE_EXTENSIONS).",  # noqa: E128,E501
                         dest="template_extensions", default=getattr(

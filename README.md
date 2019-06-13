@@ -178,6 +178,10 @@ Finally, the following additionals filters are avilable:
     Read in the contents of the file represented by `str`. This is particularly
     useful for container secrets.
 
+**boolean(str)**:
+    Convert the argument into a boolean. A case insensitive comparison to
+    "true", "yes", and "1" will return `True`. Everything else is false.
+
 ## Why not confd?
 
 Speaking of confd, why not just use it? While confd is great, it can

@@ -8,7 +8,7 @@ from tempfile import NamedTemporaryFile
 TEST_TEMPLATE_PATH = os.path.join(os.getcwd(), "tests", "templates")
 
 
-def test_simple_template(common_environment):
+def test_simple_template(common_environment, common_rendered):
     # The tmp_path fixture is not relaible across Python versions.
     # Do this ourselves.
     tmpfile = NamedTemporaryFile()
@@ -18,13 +18,23 @@ def test_simple_template(common_environment):
                cli.parse_arguments(['-o', tmpfile.name, templateFile]))
 
     output = open(tmpfile.name)
-    assert output.read() == """_=whatisthis
-LANG=en_US.UTF-8
-TERM_PROGRAM=vscode
-TERM_PROGRAM_VERSION=7
-XPC_FLAGS=0x0
-CAMEL_CASE_VARIABLE=handlethistoo
-JAVA_camelCaseVariable=thisshouldbefun"""
+    assert output.read() == common_rendered
+    output.close()
+    tmpfile.close()
+
+
+def test_include(common_environment, common_rendered):
+    tmpfile = NamedTemporaryFile()
+    templateFile = os.path.join(TEST_TEMPLATE_PATH, "include.jinja")
+    cli.render(templateFile, tmpfile.name,
+               cli.build_template_context(common_environment),
+               cli.parse_arguments(['-o', tmpfile.name,
+                                    '-b', os.path.join(
+                                        os.path.dirname(__file__), 'templates'),
+                                    templateFile]))
+
+    output = open(tmpfile.name)
+    assert output.read() == "top\n" + common_rendered
     output.close()
     tmpfile.close()
 

@@ -6,9 +6,9 @@ from j2tmpl import cli
 
 @pytest.fixture(scope="module")
 def common_environment():
-    '''
+    """
     A more common and complex environment with a variety of objects.
-    '''
+    """
     return {
         'LANG': 'en_US.UTF-8',
         'TERM': 'xterm-256color',
@@ -33,3 +33,17 @@ def common_environment():
         'EDITOR': 'vim',
         'camelCaseVariable': 'handlethistoo',
         'JAVA_camelCaseVariable': 'thisshouldbefun'}
+
+
+@pytest.fixture(scope="module")
+def common_rendered():
+    """
+    Common environment rendered with the simple template.
+    """
+    return """_=whatisthis
+LANG=en_US.UTF-8
+TERM_PROGRAM=vscode
+TERM_PROGRAM_VERSION=7
+XPC_FLAGS=0x0
+CAMEL_CASE_VARIABLE=handlethistoo
+JAVA_camelCaseVariable=thisshouldbefun"""
