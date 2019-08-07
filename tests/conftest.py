@@ -6,14 +6,20 @@ from j2tmpl import cli
 
 @pytest.fixture(scope="module")
 def common_environment():
-    '''
+    """
     A more common and complex environment with a variety of objects.
-    '''
+    """
     return {
         'LANG': 'en_US.UTF-8',
         'TERM': 'xterm-256color',
         'TERM_PROGRAM': 'vscode',
         'TERM_PROGRAM_VERSION': '7',
+        'TEST_BOOLEAN_TRUE': 'true',
+        'TEST_BOOLEAN_YES': 'yes',
+        'TEST_BOOLEAN_ONE': '1',
+        'TEST_BOOLEAN_FALSE': 'false',
+        'TEST_BOOLEAN_NO': 'no',
+        'TEST_BOOLEAN_ZERO': '0',
         'SHELL': '/bin/bash',
         'SHLVL': '2',
         '_': 'whatisthis',
@@ -28,5 +34,20 @@ def common_environment():
         'camelCaseVariable': 'handlethistoo',
         'JAVA_camelCaseVariable': 'thisshouldbefun',
         'ITERATION_TEST_2_VALUE': 'second',
-        'ITERATION_TEST_1_VALUE': 'first'
-    }
+        'ITERATION_TEST_1_VALUE': 'first'}
+
+
+@pytest.fixture(scope="module")
+def common_rendered():
+    """
+    Common environment rendered with the simple template.
+    """
+    return """_=whatisthis
+LANG=en_US.UTF-8
+TERM_PROGRAM=vscode
+TERM_PROGRAM_VERSION=7
+XPC_FLAGS=0x0
+CAMEL_CASE_VARIABLE=handlethistoo
+JAVA_camelCaseVariable=thisshouldbefun
+ITERATION_TEST_1_VALUE=first
+ITERATION_TEST_2_VALUE=second"""

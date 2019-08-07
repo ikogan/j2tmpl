@@ -47,7 +47,7 @@ import os
 import sys
 import re
 
-from jinja2 import Environment, Undefined
+from jinja2 import Environment, Undefined, FileSystemLoader
 from jinja2.exceptions import TemplateSyntaxError
 from argparse import ArgumentParser
 
@@ -55,7 +55,7 @@ from argparse import ArgumentParser
 class PermissiveUndefined(Undefined):
     """
     A more permissive undefined that also also allows
-    __getattr__. This allows `default`to work across
+    __getattr__. This allows `default` to work across
     the entire complex object.
     """
     def __getattr__(self, name):
@@ -69,8 +69,26 @@ def read_file_filter(filename):
     Jinja filter that reads the contents of a file into the template
     given the filename.
     """
+    if isinstance(filename, Undefined):
+        return filename
+
     with open(filename) as f:
         return f.read()
+
+
+def boolean_filter(value):
+    """
+    Jinja filter that returns a boolean value for a given
+    string. The following values are truthy:
+
+    true, yes, 1
+
+    Note that this is case insensitive.
+    """
+    if isinstance(value, Undefined):
+        return value
+
+    return str(value).lower() in ['true', 'yes', '1']
 
 
 ENVIRONMENT = Environment(
@@ -82,6 +100,7 @@ ENVIRONMENT = Environment(
 )
 
 ENVIRONMENT.filters['readfile'] = read_file_filter
+ENVIRONMENT.filters['boolean'] = boolean_filter
 
 
 def build_template_context(raw_context):
@@ -155,7 +174,7 @@ def render_file(template, context, output=None, append=False, verbose=False):
             if index > 0:
                 print(("%" + columns + "d:    %s") % (e.lineno - 1, source[index - 1]), file=sys.stderr)
             print(("%" + columns + "d: >> %s") % (e.lineno, source[index]), file=sys.stderr)
-            if index < len(source):
+            if index < len(source)-1:
                 print(("%" + columns + "d:    %s") % (e.lineno + 1, source[index + 1]), file=sys.stderr)
 
             raise e
@@ -174,6 +193,11 @@ def render(path, output, context, args):
     # comparisons.
     path = os.path.realpath(path)
     output_path = os.path.realpath(output) if output is not None else None
+
+    # Modify the environment to include a loader if a template
+    # base directory was specified.
+    if args.template_base_directory is not None:
+        ENVIRONMENT.loader = FileSystemLoader(args.template_base_directory)
 
     if os.path.isdir(path):
         if output_path is not None:
@@ -239,6 +263,9 @@ def parse_arguments(argv):  # pragma: no cover
     parser.add_argument("-v", "--verbose", action="store_true", default=False)
     parser.add_argument("-o", "--output",
             help="Destination file to write. If omitted, will output to stdout.")  # noqa: E128,E501
+    parser.add_argument("-b", "--template-base-directory",
+                        help="Add a base directory to lookup templates when using includes.",
+                        dest="template_base_directory", default=None)
     parser.add_argument("--template-extensions",
                         help="File extensions to interpret as template files (JINJA_TEMPLATE_EXTENSIONS).",  # noqa: E128,E501
                         dest="template_extensions", default=getattr(
@@ -257,9 +284,6 @@ def main(argv):  # pragma: no cover
     try:
         render(args.template, args.output, build_template_context(os.environ), args)
     except TemplateSyntaxError:
-        sys.exit(1)
-    except Exception:
-        print(str(sys.exc_info()[1]), file=sys.stderr)
         sys.exit(1)
 
 
