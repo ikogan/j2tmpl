@@ -26,4 +26,7 @@ def common_environment():
         'TMPDIR': '/var/folders/c8/q3fbdycd000gn/T/',
         'EDITOR': 'vim',
         'camelCaseVariable': 'handlethistoo',
-        'JAVA_camelCaseVariable': 'thisshouldbefun'}
+        'JAVA_camelCaseVariable': 'thisshouldbefun',
+        'ITERATION_TEST_2_VALUE': 'second',
+        'ITERATION_TEST_1_VALUE': 'first'
+    }

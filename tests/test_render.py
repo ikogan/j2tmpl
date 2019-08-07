@@ -18,13 +18,15 @@ def test_simple_template(common_environment):
                cli.parse_arguments(['-o', tmpfile.name, templateFile]))
 
     output = open(tmpfile.name)
-    assert output.read() == """_=whatisthis
+    assert output.read().strip() == """_=whatisthis
 LANG=en_US.UTF-8
 TERM_PROGRAM=vscode
 TERM_PROGRAM_VERSION=7
 XPC_FLAGS=0x0
 CAMEL_CASE_VARIABLE=handlethistoo
-JAVA_camelCaseVariable=thisshouldbefun"""
+JAVA_camelCaseVariable=thisshouldbefun
+ITERATION_TEST_1_VALUE=first
+ITERATION_TEST_2_VALUE=second"""
     output.close()
     tmpfile.close()
 
