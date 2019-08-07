@@ -182,6 +182,12 @@ Finally, the following additionals filters are avilable:
     Convert the argument into a boolean. A case insensitive comparison to
     "true", "yes", and "1" will return `True`. Everything else is false.
 
+**b64encode(str)**:
+    Base 64 encode the value.
+
+**b64decode(str)**:
+    Base 64 decode the value.
+
 ## Why not confd?
 
 Speaking of confd, why not just use it? While confd is great, it can

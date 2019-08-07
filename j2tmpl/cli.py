@@ -46,6 +46,7 @@ from __future__ import print_function
 import os
 import sys
 import re
+import base64
 
 from jinja2 import Environment, Undefined, FileSystemLoader
 from jinja2.exceptions import TemplateSyntaxError
@@ -60,9 +61,11 @@ class PermissiveUndefined(Undefined):
     """
     def __getattr__(self, name):
         if name[:2] == '__':
-            raise AttributeError(name)
+            raise AttributeError(name)  # pragma: no cover (note sure how to test this)
         return self
 
+
+# TODO: Find a way to test the Undefined verification below.
 
 def read_file_filter(filename):
     """
@@ -91,6 +94,26 @@ def boolean_filter(value):
     return str(value).lower() in ['true', 'yes', '1']
 
 
+def b64encode_filter(value):
+    """
+    Jinja filter that base64 encodes the given value.
+    """
+    if isinstance(value, Undefined):
+        return value
+
+    return base64.b64encode(value)
+
+
+def b64decode_filter(value):
+    """
+    Jinja filter that base64 decodes the given value.
+    """
+    if isinstance(value, Undefined):
+        return value
+
+    return base64.b64decode(value)
+
+
 ENVIRONMENT = Environment(
                  trim_blocks=True,
                  lstrip_blocks=True,
@@ -101,6 +124,8 @@ ENVIRONMENT = Environment(
 
 ENVIRONMENT.filters['readfile'] = read_file_filter
 ENVIRONMENT.filters['boolean'] = boolean_filter
+ENVIRONMENT.filters['b64encode'] = b64encode_filter
+ENVIRONMENT.filters['b64decode'] = b64decode_filter
 
 
 def build_template_context(raw_context):

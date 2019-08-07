@@ -82,6 +82,22 @@ def test_filter_boolean(common_environment):
         assert len(line) == 0 or line.strip() == 'cool', ("test %d should have been truthy" % num)
 
 
+def test_filter_base64(common_environment):
+    tmpfile = NamedTemporaryFile()
+    templateFile = os.path.join(TEST_TEMPLATE_PATH, os.path.join("filters", "base64.jinja"))
+
+    cli.render(templateFile, tmpfile.name,
+               cli.build_template_context(common_environment),
+               cli.parse_arguments(['-o', tmpfile.name, templateFile]))
+
+    output = open(tmpfile.name)
+
+    assert output.read().strip() == """CAMEL_CASE_VARIABLE_ENCODED=aGFuZGxldGhpc3Rvbw==
+CAMEL_CASE_VARIABLE_DECODED=handlethistoo
+CAMEL_CASE_VARIABLE=handlethistoo
+UNDEFINED_VARIABLE="""
+
+
 def test_undefined(common_environment):
     tmpfile = NamedTemporaryFile()
     templateFile = os.path.join(TEST_TEMPLATE_PATH, "undefined.jinja")
