@@ -49,11 +49,6 @@ from setuptools import find_packages, setup
 
 install_requires = ["jinja2"]
 
-if sys.version_info[0] < 3:
-    tests_requires = ["pytest<5", "flake8", "pytest-cover", "pytest-flake8"]
-else:
-    tests_requires = ["pytest", "flake8", "pytest-cover", "pytest-flake8"]
-
 setup(
     name="j2tmpl",
     version="0.0.9",
