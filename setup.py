@@ -206,6 +206,9 @@ configuration file with only a tiny amount complexity.
 confd is a 5.5mb or so binary and this is still less than 10mb There are likely
 ways to make this smaller that I would love to explore.
 """
+
+# flake8: noqa
+
 from setuptools import find_packages, setup
 
 install_requires = ["jinja2"]
