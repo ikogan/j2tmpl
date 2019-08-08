@@ -5,6 +5,6 @@ TERM_PROGRAM_VERSION={{ term.program.version }}
 XPC_FLAGS={{ xpc.flags }}
 CAMEL_CASE_VARIABLE={{ camel.case.variable }}
 JAVA_camelCaseVariable={{ java.camel.case.variable }}
-{% for var in iteration.test.values() %}
+{% for k, var in iteration.test|dictsort %}
 ITERATION_TEST_{{ loop.index }}_VALUE={{ var.value }}
 {% endfor %}

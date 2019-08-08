@@ -101,7 +101,7 @@ def b64encode_filter(value):
     if isinstance(value, Undefined):
         return value
 
-    return base64.b64encode(value)
+    return base64.b64encode(value.encode('utf-8')).decode('utf-8')
 
 
 def b64decode_filter(value):
@@ -111,7 +111,7 @@ def b64decode_filter(value):
     if isinstance(value, Undefined):
         return value
 
-    return base64.b64decode(value)
+    return base64.b64decode(value.encode('utf-8')).decode('utf-8')
 
 
 ENVIRONMENT = Environment(
