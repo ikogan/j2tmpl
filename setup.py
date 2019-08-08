@@ -44,7 +44,6 @@ Would result in:
 
 See the GitHub README for more details.
 """
-import sys
 from setuptools import find_packages, setup
 
 install_requires = ["jinja2"]
