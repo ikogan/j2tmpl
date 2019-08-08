@@ -44,10 +44,15 @@ Would result in:
 
 See the GitHub README for more details.
 """
+import sys
 from setuptools import find_packages, setup
 
 install_requires = ["jinja2"]
-tests_requires = ["pytest", "flake8", "pytest-cover", "pytest-flake8"]
+
+if sys.version_info[0] < 3:
+    tests_requires = ["pytest<5", "flake8", "pytest-cover", "pytest-flake8"]
+else:
+    tests_requires = ["pytest", "flake8", "pytest-cover", "pytest-flake8"]
 
 setup(
     name="j2tmpl",
