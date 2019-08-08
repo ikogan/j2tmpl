@@ -128,7 +128,7 @@ This can be used in two ways: processing a single file, or an entire directory.
 
 When a directory path is passed as the template file,
 `j2tmpl` will scan the directory for any files with
-an extension matching `template-extensions`, an argument than
+an extension matching `template-extensions`, an argument that
 defaults to `tmpl,jinja,jinja2,j2,jnj`.
 
 > Note that it will _still_ output to stdout unless `-o` is used.
