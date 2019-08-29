@@ -8,6 +8,8 @@ matrix:
   - os: linux
     python: 3.7
     dist: xenial
+before_install:
+- apt install -y upx binutils patchelf
 install:
 - pip install -U pip
 - pip install staticx pyinstaller jinja2
