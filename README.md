@@ -197,5 +197,5 @@ projects, it probably makes sense, but I would often like to just
 barf some environment variables into a configuration file with only
 a tiny amount complexity.
 
-confd is a 5.5mb or so binary and this is still less than 10mb There are likely
+confd is a 5.5mb or so binary and this is still less than 15mb. There are likely
 ways to make this smaller that I would love to explore.
