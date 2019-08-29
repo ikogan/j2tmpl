@@ -9,7 +9,10 @@ matrix:
     python: 3.7
     dist: xenial
 before_install:
-- apt install -y upx binutils patchelf
+- sudo apt install -y upx binutils patchelf
+addons:
+    apt:
+        update: true
 install:
 - pip install -U pip
 - pip install staticx pyinstaller jinja2
