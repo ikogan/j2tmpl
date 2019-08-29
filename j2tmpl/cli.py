@@ -204,7 +204,7 @@ def render_file(template, context, output=None, append=False, verbose=False):
 
             raise e
 
-    if output:
+    if output and output != sys.stdout:
         output.close()
 
 

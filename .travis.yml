@@ -10,11 +10,12 @@ matrix:
     dist: xenial
 install:
 - pip install -U pip
-- pip install pyinstaller jinja2
+- pip install staticx pyinstaller jinja2
 script:
 - python setup.py test
 - python setup.py build
 - python -OO -m PyInstaller -F j2tmpl/cli.py -n j2tmpl
+- staticx dist/j2tmpl dist/j2tmpl
 deploy:
   - provider: releases
     api_key:

@@ -9,7 +9,7 @@ tests_requires = ["pytest", "flake8", "pytest-cover", "pytest-flake8"]
 
 setup(
     name="j2tmpl",
-    version="0.0.9",
+    version="0.0.10",
     author="Ilya Kogan",
     author_email="kogan@ohio.edu",
     url="https://github.com/ikogan/j2tmpl",
@@ -22,7 +22,7 @@ setup(
     install_requires=install_requires,
     extras_require={
         "tests": install_requires + tests_requires,
-        "build": "pyinstaller"
+        "build": ["pyinstaller", "staticx"]
     },
     setup_requires=["pytest-runner"],
     tests_require=install_requires + tests_requires,
