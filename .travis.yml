@@ -18,7 +18,7 @@ install:
 - pip install staticx pyinstaller jinja2
 script:
 - python setup.py test
-- python setup.py build
+- python setup.py bdist_egg bdist_wheel
 - python -OO -m PyInstaller -F j2tmpl/cli.py -n j2tmpl
 - staticx dist/j2tmpl dist/j2tmpl
 deploy:
@@ -29,6 +29,7 @@ deploy:
     file:
       - dist/j2tmpl
       - dist/j2tmpl-*.egg
+      - dist/j2tmpl-*.whl
     draft: true
     overwrite: true
     skip_cleanup: true

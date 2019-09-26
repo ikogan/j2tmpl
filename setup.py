@@ -9,7 +9,7 @@ tests_requires = ["pytest", "flake8", "pytest-cover", "pytest-flake8"]
 
 setup(
     name="j2tmpl",
-    version="0.0.10",
+    version="0.0.11",
     author="Ilya Kogan",
     author_email="kogan@ohio.edu",
     url="https://github.com/ikogan/j2tmpl",
@@ -27,7 +27,7 @@ setup(
     setup_requires=["pytest-runner"],
     tests_require=install_requires + tests_requires,
     include_package_data=True,
-    entry_points={"console_scripts": ["j2tmpl = j2tmpl:main"]},
+    entry_points={"console_scripts": ["j2tmpl = j2tmpl:entrypoint"]},
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
@@ -35,7 +35,6 @@ setup(
         "Operating System :: OS Independent",
         "Topic :: Software Development",
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",

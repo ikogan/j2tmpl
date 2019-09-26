@@ -5,7 +5,7 @@ if [[ -e /proc/1/cgroup ]] && (grep -q docker /proc/1/cgroup || grep -q user.sli
     find . -name '*.pyc' -delete
     rm -Rf dist/*
     python3 setup.py test
-    python3 setup.py build
+    python3 setup.py bdist_egg bdist_wheel
     python3 -OO -m PyInstaller -F j2tmpl/cli.py -n j2tmpl
     staticx dist/j2tmpl dist/j2tmpl
 else
