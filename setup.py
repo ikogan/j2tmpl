@@ -5,11 +5,11 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 install_requires = ["jinja2"]
-tests_requires = ["pytest", "flake8", "pytest-cover", "pytest-flake8"]
+tests_requires = ["pytest", "flake8<3.8.0", "pytest-cover", "pytest-flake8"]
 
 setup(
     name="j2tmpl",
-    version="0.0.12",
+    version="0.0.13",
     author="Ilya Kogan",
     author_email="kogan@ohio.edu",
     url="https://github.com/ikogan/j2tmpl",

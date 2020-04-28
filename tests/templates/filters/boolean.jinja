@@ -8,6 +8,8 @@
 
 {% if test.boolean.one|boolean %}cool{% else %}bad{% endif %}
 
+{% if test.boolean.on|boolean %}cool{% else %}bad{% endif %}
+
 {% if test.boolean.false|boolean %}bad{% else %}cool{% endif %}
 
 {% if test.boolean.false|upper|boolean %}bad{% else %}cool{% endif %}
@@ -15,5 +17,7 @@
 {% if test.boolean.no|boolean %}bad{% else %}cool{% endif %}
 
 {% if test.boolean.zero|boolean %}bad{% else %}cool{% endif %}
+
+{% if test.boolean.off|boolean %}bad{% else %}cool{% endif %}
 
 {% if test.boolean.undefined|boolean %}bad{% else %}cool{% endif %}

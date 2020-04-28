@@ -180,7 +180,7 @@ Finally, the following additionals filters are avilable:
 
 **boolean(str)**:
     Convert the argument into a boolean. A case insensitive comparison to
-    "true", "yes", and "1" will return `True`. Everything else is false.
+    "true", "yes", "on", and "1" will return `True`. Everything else is false.
 
 **b64encode(str)**:
     Base 64 encode the value.

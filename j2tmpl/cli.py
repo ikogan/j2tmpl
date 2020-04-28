@@ -91,7 +91,7 @@ def boolean_filter(value):
     if isinstance(value, Undefined):
         return value
 
-    return str(value).lower() in ['true', 'yes', '1']
+    return str(value).lower() in ['true', 'yes', 'on', '1']
 
 
 def b64encode_filter(value):
