@@ -13,4 +13,5 @@ COPY j2tmpl /app/j2tmpl
 
 WORKDIR /app
 
-ENTRYPOINT /app/build.sh
+ENTRYPOINT [ "/app/build.sh" ]
+CMD [ "build" ]
