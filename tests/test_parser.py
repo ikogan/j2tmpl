@@ -1,7 +1,10 @@
-from j2tmpl import cli
-
+'''
+Tests parsing the environment into the template context.
+'''
+# pylint: disable=missing-function-docstring
 import pytest
 
+from j2tmpl import cli
 
 def test_parse_simple():
     context = cli.build_template_context({'A': 1, 'B': 2, 'C': 3})

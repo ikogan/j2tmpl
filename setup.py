@@ -1,11 +1,14 @@
 #!/usr/bin/env python
+'''
+Setup for j2mpl
+'''
 from setuptools import find_packages, setup
 
-with open("README.md", "r") as fh:
+with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 install_requires = ["jinja2"]
-tests_requires = ["pytest", "flake8<3.8.0", "pytest-cover", "pytest-flake8"]
+tests_requires = ["pytest", "pylint", "pytest-cover", "pytest-pylint"]
 
 setup(
     name="j2tmpl",

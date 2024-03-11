@@ -1,14 +1,14 @@
-# flake8: noqa E501
+'''
+Common fixtures used throughout the tests.
+'''
 import pytest
-
-from j2tmpl import cli
-
 
 @pytest.fixture(scope="module")
 def common_environment():
     """
     A more common and complex environment with a variety of objects.
     """
+    # pylint: disable=line-too-long
     return {
         'LANG': 'en_US.UTF-8',
         'TERM': 'xterm-256color',
@@ -37,6 +37,7 @@ def common_environment():
         'JAVA_camelCaseVariable': 'thisshouldbefun',
         'ITERATION_TEST_2_VALUE': 'second',
         'ITERATION_TEST_1_VALUE': 'first'}
+    # pylint: enable=line-too-long
 
 
 @pytest.fixture(scope="module")

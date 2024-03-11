@@ -1,37 +1,19 @@
+"""
+Tests traversing and rendering templates in a
+directory tree.
+"""
+# pylint: disable=missing-function-docstring
 import os
+from shutil import copytree
+from tempfile import TemporaryDirectory
 from j2tmpl import cli
-from distutils.dir_util import copy_tree
-
-try:
-    from tempfile import TemporaryDirectory
-except ImportError:
-    import shutil
-    from tempfile import mkdtemp
-
-    # Note, taken from Python 3's implementation
-    # but simplified for just this use.
-    class TemporaryDirectory:
-        def __init__(self):
-            self.name = mkdtemp()
-
-        def __enter__(self):
-            return self.name
-
-        def __exit__(self, exc, value, tb):
-            self.cleanup()
-
-        def __del__(self):
-            self.cleanup()
-
-        def cleanup(self):
-            shutil.rmtree(self.name)
 
 TEST_TEMPLATE_PATH = os.path.join(os.getcwd(), "tests", "templates")
 
-
+# pylint: disable=unused-argument
 def assert_comparisons(tmpdir, tmpdestdir, comparisons):
     for srcpath, destpath in comparisons:
-        with open(srcpath) as src, open(destpath) as dest:
+        with open(srcpath, encoding="utf-8") as src, open(destpath, encoding="utf-8") as dest:
             assert src.read() == dest.read()
 
 
@@ -39,7 +21,8 @@ def render_directory(srcdir, dstdir, context, directory, recursive=False):
     templatedir = os.path.join(TEST_TEMPLATE_PATH, directory, "templates")
     rendereddir = os.path.join(TEST_TEMPLATE_PATH, directory, "rendered")
 
-    copy_tree(templatedir, srcdir)
+    os.rmdir(srcdir)
+    copytree(templatedir, srcdir)
 
     if recursive:
         args = cli.parse_arguments(['-r', '-o', srcdir, dstdir])
@@ -67,16 +50,14 @@ def simple_directory(srcdir, dstdir, context):
 
 
 def test_simple_directory(common_environment):
-    tmpdir = TemporaryDirectory()
-    tmpdestdir = TemporaryDirectory()
-
-    simple_directory(tmpdir.name, tmpdestdir.name, common_environment)
+    with TemporaryDirectory(suffix="source") as tmpdir:
+        with TemporaryDirectory(suffix="dest") as tmpdestdir:
+            simple_directory(tmpdir, tmpdestdir, common_environment)
 
 
 def test_simple_directory_inplace(common_environment):
-    tmpdir = TemporaryDirectory()
-
-    simple_directory(tmpdir.name, tmpdir.name, common_environment)
+    with TemporaryDirectory() as tmpdir:
+        simple_directory(tmpdir, tmpdir, common_environment)
 
 
 def simple_directory_recursive(srcdir, dstdir, context):
@@ -94,16 +75,14 @@ def simple_directory_recursive(srcdir, dstdir, context):
 
 
 def test_simple_directory_recursive(common_environment):
-    tmpdir = TemporaryDirectory()
-    tmpdestdir = TemporaryDirectory()
-
-    simple_directory_recursive(tmpdir.name, tmpdestdir.name, common_environment)
+    with TemporaryDirectory(suffix="source") as tmpdir:
+        with TemporaryDirectory(suffix="dest") as tmpdestdir:
+            simple_directory_recursive(tmpdir, tmpdestdir, common_environment)
 
 
 def test_simple_directory_recursive_inplace(common_environment):
-    tmpdir = TemporaryDirectory()
-
-    simple_directory_recursive(tmpdir.name, tmpdir.name, common_environment)
+    with TemporaryDirectory() as tmpdir:
+        simple_directory_recursive(tmpdir, tmpdir, common_environment)
 
 
 def fragment_directory(srcdir, dstdir, context):
@@ -135,16 +114,14 @@ def fragment_directory(srcdir, dstdir, context):
 
 
 def test_fragment_directory(common_environment):
-    tmpdir = TemporaryDirectory()
-    tmpdestdir = TemporaryDirectory()
-
-    fragment_directory(tmpdir.name, tmpdestdir.name, common_environment)
+    with TemporaryDirectory(suffix="source") as tmpdir:
+        with TemporaryDirectory(suffix="dest") as tmpdestdir:
+            fragment_directory(tmpdir, tmpdestdir, common_environment)
 
 
 def test_fragment_directory_inplace(common_environment):
-    tmpdir = TemporaryDirectory()
-
-    fragment_directory(tmpdir.name, tmpdir.name, common_environment)
+    with TemporaryDirectory() as tmpdir:
+        fragment_directory(tmpdir, tmpdir, common_environment)
 
 
 def fragment_directory_recursive(srcdir, dstdir, context):
@@ -178,13 +155,11 @@ def fragment_directory_recursive(srcdir, dstdir, context):
 
 
 def test_fragment_directory_recursive(common_environment):
-    tmpdir = TemporaryDirectory()
-    tmpdestdir = TemporaryDirectory()
-
-    fragment_directory_recursive(tmpdir.name, tmpdestdir.name, common_environment)
+    with TemporaryDirectory(suffix="source") as tmpdir:
+        with TemporaryDirectory(suffix="dest") as tmpdestdir:
+            fragment_directory_recursive(tmpdir, tmpdestdir, common_environment)
 
 
 def test_fragment_directory_recursive_inplace(common_environment):
-    tmpdir = TemporaryDirectory()
-
-    fragment_directory_recursive(tmpdir.name, tmpdir.name, common_environment)
+    with TemporaryDirectory() as tmpdir:
+        fragment_directory_recursive(tmpdir, tmpdir, common_environment)

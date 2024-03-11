@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.11
 
 RUN apt-get update && apt-get install -y binutils patchelf upx && rm -rf /var/lib/apt/lists/*
 RUN pip3 install staticx pyinstaller jinja2

@@ -48,11 +48,13 @@ import sys
 import re
 import base64
 
-from jinja2 import Environment, Undefined, FileSystemLoader
-from jinja2.exceptions import TemplateSyntaxError
 from argparse import ArgumentParser
 
+from jinja2 import Environment, Undefined, FileSystemLoader
+from jinja2.exceptions import TemplateSyntaxError
 
+
+# pylint: disable=too-few-public-methods
 class PermissiveUndefined(Undefined):
     """
     A more permissive undefined that also also allows
@@ -63,9 +65,8 @@ class PermissiveUndefined(Undefined):
         if name[:2] == '__':
             raise AttributeError(name)  # pragma: no cover (note sure how to test this)
         return self
+# pylint: enable=too-few-public-methods
 
-
-# TODO: Find a way to test the Undefined verification below.
 
 def read_file_filter(filename):
     """
@@ -75,8 +76,8 @@ def read_file_filter(filename):
     if isinstance(filename, Undefined):
         return filename
 
-    with open(filename) as f:
-        return f.read()
+    with open(filename, encoding="utf-8") as j2filter:
+        return j2filter.read()
 
 
 def boolean_filter(value):
@@ -127,7 +128,7 @@ ENVIRONMENT.filters['boolean'] = boolean_filter
 ENVIRONMENT.filters['b64encode'] = b64encode_filter
 ENVIRONMENT.filters['b64decode'] = b64decode_filter
 
-
+# pylint: disable=too-many-nested-blocks
 def build_template_context(raw_context):
     """
     Build a template context from a given `raw_context`.
@@ -141,73 +142,78 @@ def build_template_context(raw_context):
     """
     context = {}
 
-    for k, v in raw_context.items():
-        originalKey = k
-        k = re.sub('_+', '_', re.sub('([a-z])([A-Z])', r'\1_\2', k).lower())
-        keys = ['_'] if k == '_' else list(
-            filter(lambda x: len(x) > 0, k.split('_')))
+    for key, value in raw_context.items():
+        original_key = key
+        key = re.sub('_+', '_', re.sub('([a-z])([A-Z])', r'\1_\2', key).lower())
+        keys = ['_'] if key == '_' else list(
+            filter(lambda x: len(x) > 0, key.split('_')))
 
-        currentLevel = context
-        for level in range(0, len(keys)):
-            levelKey = keys[level].lower()
+        current_level = context
+        for level, level_key in enumerate(keys):
+            level_key = level_key.lower()
 
-            if levelKey in currentLevel.keys():
-                if type(currentLevel[levelKey]) == dict:
+            if level_key in current_level:
+                if isinstance(current_level[level_key], dict):
                     if level == len(keys) - 1:
-                        if '_' in currentLevel[levelKey]:
-                            raise ValueError('%s is defined multiple times.' % (originalKey))  # noqa: E501
+                        if '_' in current_level[level_key]:
+                            raise ValueError(f'{original_key} is defined multiple times.')
 
-                        currentLevel[levelKey]['_'] = v
+                        current_level[level_key]['_'] = value
                 else:
                     if level == len(keys) - 1:
-                        raise ValueError('%s is defined multiple times.' % (originalKey))  # noqa: E501
+                        raise ValueError(f'{original_key} is defined multiple times.')
 
-                    currentValue = currentLevel[levelKey]
-                    currentLevel[levelKey] = {
-                        '_': currentValue
+                    current_value = current_level[level_key]
+                    current_level[level_key] = {
+                        '_': current_value
                     }
             elif level == len(keys) - 1:
-                currentLevel[levelKey] = v
+                current_level[level_key] = value
             else:
-                currentLevel[levelKey] = {}
+                current_level[level_key] = {}
 
-            currentLevel = currentLevel[levelKey]
+            current_level = current_level[level_key]
 
     return context
+# pylint: enable=too-many-nested-blocks
 
 
 def render_file(template, context, output=None, append=False, verbose=False):
+    """
+    Render a given template.
+    """
     if verbose:  # pragma: no cover
         if output is None or template == output:
             print("Rendering", template)
         else:
             print("Rendering", template, "to", output)
 
-    with open(template) as f:
-        output = open(output, 'a' if append else 'w') \
-            if output else sys.stdout
+    with open(template, encoding="utf-8") as template_file:
+        output = open(output, 'a' if append else 'w', encoding="utf-8") \
+            if output else sys.stdout # pylint: disable=consider-using-with
 
         try:
-            ENVIRONMENT.from_string(f.read()).stream(context).dump(output)
-        except TemplateSyntaxError as e:
-            source = e.source.splitlines()
-            columns = str(len(str(e.lineno + 1)))
-            index = e.lineno - 1
+            ENVIRONMENT.from_string(template_file.read()).stream(context).dump(output)
+        except TemplateSyntaxError as err:
+            source = err.source.splitlines()
+            columns = str(len(str(err.lineno + 1)))
+            index = err.lineno - 1
 
-            print("Error rendering %s: %s" % (template, e.message), file=sys.stderr)
+            print(f"Error rendering {template}: {err.message}", file=sys.stderr)
 
             if index > 0:
-                print(("%" + columns + "d:    %s") % (e.lineno - 1, source[index - 1]), file=sys.stderr)
-            print(("%" + columns + "d: >> %s") % (e.lineno, source[index]), file=sys.stderr)
+                print(("%" + columns + "d:    %s") % (err.lineno - 1, source[index - 1]), file=sys.stderr)
+            print(("%" + columns + "d: >> %s") % (err.lineno, source[index]), file=sys.stderr)
             if index < len(source)-1:
-                print(("%" + columns + "d:    %s") % (e.lineno + 1, source[index + 1]), file=sys.stderr)
+                print(("%" + columns + "d:    %s") % (err.lineno + 1, source[index + 1]), file=sys.stderr)
 
-            raise e
+            raise err
 
     if output and output != sys.stdout:
         output.close()
 
 
+# pylint: disable=too-many-nested-blocks disable=too-many-branches
 def render(path, output, context, args):
     """
     Render a template based on the arguments and
@@ -229,7 +235,7 @@ def render(path, output, context, args):
             if not os.path.exists(output_path):
                 os.makedirs(output_path)
             elif not os.path.isdir(output_path):
-                raise OSError("%s already exists and is not a directory" % (output_path))
+                raise OSError(f"{output_path} already exists and is not a directory")
 
         # So we could use os.walk here but we need to control
         # what we do with directories based on the name so
@@ -277,9 +283,14 @@ def render(path, output, context, args):
                 render_file(entry_path, context, output=target_entry_path, verbose=args.verbose)
     else:
         render_file(path, context, output=output_path, verbose=args.verbose)
+# pylint: enable=too-many-nested-blocks enable=too-many-branches
 
 
 def parse_arguments(argv):  # pragma: no cover
+    """
+    Parse all command line arguments.
+    """
+
     parser = ArgumentParser()
     parser.add_argument("template", help="Jinja template file or directory to render.")
     parser.add_argument("-r", "--recursive", action="store_true",
@@ -292,7 +303,7 @@ def parse_arguments(argv):  # pragma: no cover
                         help="Add a base directory to lookup templates when using includes.",
                         dest="template_base_directory", default=None)
     parser.add_argument("--template-extensions",
-                        help="File extensions to interpret as template files (JINJA_TEMPLATE_EXTENSIONS).",  # noqa: E128,E501
+                        help="File extensions to interpret as template files (JINJA_TEMPLATE_EXTENSIONS).",  # pylint: disable=line-too-long
                         dest="template_extensions", default=getattr(
                             os.environ, 'JINJA_TEMPLATE_EXTENSIONS', 'tmpl,jinja,jinja2,jnj,j2'))
 
@@ -304,6 +315,10 @@ def parse_arguments(argv):  # pragma: no cover
 
 
 def main(argv):  # pragma: no cover
+    """
+    Render a given file as a jinja template with environment
+    variables as context. See --help or README.md for details.
+    """
     args = parse_arguments(argv)
 
     try:
