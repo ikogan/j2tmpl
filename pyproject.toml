@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=77.0.3", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "j2tmpl"
+version = "0.1.0"
+description = "Jinja2 templating based on environment variables."
+readme = "README.md"
+requires-python = ">=3.14"
+license = "BSD-3-Clause"
+authors = [ { name = "Ilya Kogan", email = "kogan@ohio.edu" } ]
+urls = { "Homepage" = "https://github.com/ikogan/j2tmpl" }
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "jinja2~=3.1.6",
+]
+
+[project.optional-dependencies]
+tests = ["pytest~=9.0.1", "flake8~=7.3.0", "pytest-cov~=7.0.0", "pytest-flake8~=1.3.0", "flake8-pyproject~=1.2.0"]
+build = ["pyinstaller~=6.16.0","build~=1.3.0"]
+
+[project.entry-points.console_scripts]
+j2tmpl = "j2tmpl:entrypoint"
+
+[tool.pytest.ini_options]
+addopts = "--cov-report term-missing --cov 'j2tmpl' --flake8"
+
+[tool.flake8]
+max-line-length = 120

@@ -152,7 +152,7 @@ def build_template_context(raw_context):
             levelKey = keys[level].lower()
 
             if levelKey in currentLevel.keys():
-                if type(currentLevel[levelKey]) == dict:
+                if isinstance(currentLevel[levelKey], dict):
                     if level == len(keys) - 1:
                         if '_' in currentLevel[levelKey]:
                             raise ValueError('%s is defined multiple times.' % (originalKey))  # noqa: E501
