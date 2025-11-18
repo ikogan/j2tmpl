@@ -1,0 +1,89 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release Version'
+        required: true
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.14'
+
+      - name: Install build requirements
+        run: |
+          python -m pip install -e '.[tests,build]'
+
+      - name: Run tests
+        run: pytest -q
+
+      - name: Build distributions
+        run: |
+          python -m build --sdist --wheel
+
+      - name: Build PyInstaller binary
+        run: |
+          python -OO -m PyInstaller -F j2tmpl/cli.py -n j2tmpl
+          # move the produced binary to a predictable path
+          if [ -d dist ]; then
+            mkdir -p release-artifacts
+            BIN_PATH=$(ls dist | grep -E '^j2tmpl($|\..*)' | head -n1 || true)
+            # For Linux the binary will be under dist/
+            if [ -f "dist/j2tmpl" ]; then
+              mv dist/j2tmpl release-artifacts/j2tmpl
+            else
+              # fallback: move entire dist contents
+              cp -r dist/* release-artifacts/
+            fi
+          fi
+
+      - name: Compute SHA256 checksum for binary
+        run: |
+          mkdir -p release-artifacts
+          if [ -f release-artifacts/j2tmpl ]; then
+            sha256sum release-artifacts/j2tmpl | awk '{print $1}' > release-artifacts/j2tmpl.sha256
+          fi
+
+      - name: Prepare assets list
+        id: assets
+        run: |
+          mkdir -p artifacts
+          # copy wheel and sdist
+          cp dist/*.whl artifacts/ || true
+          cp dist/*.tar.gz artifacts/ || true
+          # copy binary and checksum
+          cp release-artifacts/* artifacts/ || true
+          ls -la artifacts
+          echo "assets=$(ls artifacts | tr '\n' ',' | sed 's/,$//')" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release (pre-release)
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name || github.event.inputs.version }}
+          name: ${{ github.ref_name || github.event.inputs.version }}
+          draft: false
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload assets to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts
+          asset_name: artifacts
+          asset_content_type: application/zip
