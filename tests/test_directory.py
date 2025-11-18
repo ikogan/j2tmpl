@@ -1,11 +1,10 @@
 import os
+import shutil
 from j2tmpl import cli
-from distutils.dir_util import copy_tree
 
 try:
     from tempfile import TemporaryDirectory
 except ImportError:
-    import shutil
     from tempfile import mkdtemp
 
     # Note, taken from Python 3's implementation
@@ -39,7 +38,7 @@ def render_directory(srcdir, dstdir, context, directory, recursive=False):
     templatedir = os.path.join(TEST_TEMPLATE_PATH, directory, "templates")
     rendereddir = os.path.join(TEST_TEMPLATE_PATH, directory, "rendered")
 
-    copy_tree(templatedir, srcdir)
+    shutil.copytree(templatedir, srcdir, dirs_exist_ok=True)
 
     if recursive:
         args = cli.parse_arguments(['-r', '-o', srcdir, dstdir])
