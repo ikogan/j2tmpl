@@ -22,7 +22,7 @@
         "ghcr.io/lukewiwa/features/shellcheck:0": {},
         "ghcr.io/ChristopherMacGown/devcontainer-features/mcfly:1": {}
     },
-    "postStartCommand": "pip install -e .'[tests,build]'",
+    "postStartCommand": "pip install -e '.[tests,build]'",
     "remoteEnv": {
         "HOST_HOME": "${localEnv:HOME}"
     }
