@@ -1,0 +1,29 @@
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install GitHub CLI
+        uses: cli/gh-action@v2
+
+      - name: Download release assets into dist/
+        run: |
+          mkdir -p dist
+          gh release download "${{ github.event.release.tag_name }}" --pattern "*.whl" --pattern "*.tar.gz" --dir dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to PyPI using pypa action
+        uses: pypa/gh-action-pypi-publish@v1
