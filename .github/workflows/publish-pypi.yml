@@ -11,12 +11,10 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    if: "!github.event.release.prerelease"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Install GitHub CLI
-        uses: cli/gh-action@v2
 
       - name: Download release assets into dist/
         run: |
