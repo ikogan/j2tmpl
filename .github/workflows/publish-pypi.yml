@@ -2,7 +2,7 @@ name: Publish to PyPI
 
 on:
   release:
-    types: [published]
+    types: [released]
 
 permissions:
   contents: read
@@ -11,7 +11,6 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    if: github.event.release.prerelease == false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
