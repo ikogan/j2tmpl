@@ -1,6 +1,6 @@
 # Jinja 2 Command Line Template Renderer
 
-[![Build Status](https://travis-ci.org/ikogan/j2tmpl.svg?branch=master)](https://travis-ci.org/ikogan/j2tmpl)
+[![CI](https://github.com/ikogan/j2tmpl/actions/workflows/ci.yml/badge.svg)](https://github.com/ikogan/j2tmpl/actions/workflows/ci.yml)
 
 Jinja2 command line renderer that converts environment variables
 into objects on the context. For example:
