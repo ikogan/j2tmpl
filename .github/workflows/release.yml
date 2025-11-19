@@ -42,11 +42,10 @@ jobs:
           sha256sum dist/j2tmpl | awk '{print $1}' > dist/j2tmpl.sha256
 
       - name: Upload all artifacts to release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.release.tag_name }}
           generate_release_notes: true
-          make_latest: "true"
           files: dist/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
