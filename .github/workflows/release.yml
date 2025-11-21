@@ -10,7 +10,6 @@ permissions:
 jobs:
   build-and-upload:
     runs-on: ubuntu-latest
-    container: fydeinc/pyinstaller
     env:
       PYTHONUNBUFFERED: '1'
     steps:
@@ -35,8 +34,16 @@ jobs:
           python -m build --sdist --wheel
 
       - name: Build PyInstaller binary
-        run: |
-          python -OO -m PyInstaller -F j2tmpl/cli.py -n j2tmpl
+        uses: addnab/docker-run-action@v3
+        with:
+          image: ghcr.io/yt-dlp/manylinux_2_28_x86_64-shared
+          options: -v ${{ github.workspace }}:/github/workspace
+          run: |
+            curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+            /opt/shared-cpython-3.14/bin/python3.14 get-pip.py
+            cd /github/workspace
+            /opt/shared-cpython-3.14/bin/python3.14 -m pip install -e '.[build,binary]'
+            /opt/shared-cpython-3.14/bin/python3.14 -OO -m PyInstaller -F j2tmpl/cli.py -n j2tmpl
 
       - name: Compute SHA256 checksum for binary
         run: |
