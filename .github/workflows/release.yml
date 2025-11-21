@@ -10,6 +10,7 @@ permissions:
 jobs:
   build-and-upload:
     runs-on: ubuntu-latest
+    container: fydeinc/pyinstaller
     env:
       PYTHONUNBUFFERED: '1'
     steps:
